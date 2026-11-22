@@ -1,0 +1,2841 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RODA KEBERUNTUNGAN – SISTEM PENCERNAAN MANUSIA</title>
+  <style>
+    :root {
+      --bg-grad-1: #fef3c7;
+      --bg-grad-2: #e0f2fe;
+      --bg-grad-3: #dcfce7;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --ink: #0f172a;
+      --ink-muted: #475569;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #f59e0b;
+      --accent-dark: #d97706;
+      --success: #16a34a;
+      --success-dark: #15803d;
+      --danger: #dc2626;
+      --danger-dark: #b91c1c;
+      --purple: #7c3aed;
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-3d: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 6px 0 rgba(15, 23, 42, 0.08);
+      --font-main: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-main);
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 50%, var(--bg-grad-3) 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Confetti Canvas */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Top Header */
+    .topbar {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 3px solid #fde68a;
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    .topbar-inner {
+      max-width: 1380px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f59e0b, #ef4444, #8b5cf6);
+      display: grid;
+      place-items: center;
+      font-size: 26px;
+      color: #fff;
+      box-shadow: 0 4px 0 #b45309;
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: clamp(1.05rem, 2.1vw, 1.5rem);
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      color: #0f172a;
+      line-height: 1.15;
+    }
+
+    .brand-title span {
+      color: #2563eb;
+    }
+
+    .brand-sub {
+      margin: 2px 0 0;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink-muted);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* 3D Tactile Buttons */
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 10px 16px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: transform 0.1s ease, filter 0.15s ease, box-shadow 0.1s ease;
+      position: relative;
+      top: 0;
+      user-select: none;
+    }
+
+    .btn:hover:not(:disabled) {
+      filter: brightness(1.05);
+    }
+
+    .btn:active:not(:disabled) {
+      top: 3px;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25) !important;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #3b82f6, #2563eb);
+      color: #fff;
+      box-shadow: 0 4px 0 #1e40af;
+    }
+
+    .btn-success {
+      background: linear-gradient(180deg, #22c55e, #16a34a);
+      color: #fff;
+      box-shadow: 0 4px 0 #166534;
+    }
+
+    .btn-accent {
+      background: linear-gradient(180deg, #fbbf24, #f59e0b);
+      color: #1e293b;
+      box-shadow: 0 4px 0 #b45309;
+    }
+
+    .btn-danger {
+      background: linear-gradient(180deg, #ef4444, #dc2626);
+      color: #fff;
+      box-shadow: 0 4px 0 #991b1b;
+    }
+
+    .btn-purple {
+      background: linear-gradient(180deg, #8b5cf6, #7c3aed);
+      color: #fff;
+      box-shadow: 0 4px 0 #5b21b6;
+    }
+
+    .btn-soft {
+      background: #f1f5f9;
+      color: #1e293b;
+      border: 2px solid #cbd5e1;
+      box-shadow: 0 3px 0 #cbd5e1;
+    }
+
+    .btn-lg {
+      padding: 14px 26px;
+      font-size: 1.12rem;
+      border-radius: 18px;
+    }
+
+    /* Container & Views */
+    .container {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 18px 16px 40px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* 3D Card Surface */
+    .card-3d {
+      background: var(--surface);
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-3d);
+      padding: 20px;
+    }
+
+    /* Collapsible Quick Guide Box */
+    .guide-box {
+      background: linear-gradient(135deg, #fffbeb 0%, #eff6ff 100%);
+      border: 2px solid #fcd34d;
+      border-left: 8px solid #2563eb;
+      border-radius: 20px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .guide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .guide-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .guide-pill {
+      background: #2563eb;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+    }
+
+    .guide-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    .guide-content {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+    }
+
+    .guide-step {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .guide-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .guide-step p {
+      margin: 0;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: #334155;
+      font-weight: 600;
+    }
+
+    /* Setup Screen Layout */
+    .setup-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 920px) {
+      .setup-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .section-heading {
+      margin: 0 0 14px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #0f172a;
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .mode-card {
+      border: 3px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: 14px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .mode-card.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+      box-shadow: 0 5px 0 #93c5fd;
+      transform: translateY(-2px);
+    }
+
+    .mode-card-title {
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mode-card-desc {
+      margin: 4px 0 0;
+      font-size: 0.84rem;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    .participant-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .participant-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .participant-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 6px 10px;
+      transition: border-color 0.15s;
+    }
+
+    .participant-item:focus-within {
+      border-color: #2563eb;
+      background: #fff;
+    }
+
+    .participant-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.85rem;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .participant-input {
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+      width: 100%;
+      outline: none;
+    }
+
+    .remove-btn {
+      border: none;
+      background: #fee2e2;
+      color: #dc2626;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      font-weight: 900;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .remove-btn:hover {
+      background: #fecaca;
+    }
+
+    .setting-group {
+      margin-bottom: 16px;
+    }
+
+    .setting-label {
+      display: block;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .pill-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill-choice {
+      border: 2px solid #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pill-choice.active {
+      background: #2563eb;
+      border-color: #1d4ed8;
+      color: #fff;
+      box-shadow: 0 3px 0 #1e3a8a;
+    }
+
+    .category-preview-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .cat-chip {
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 7px 10px;
+      border-radius: 10px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Main Game Workspace */
+    .game-layout {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .game-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Turn Banner */
+    .turn-banner {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: #fff;
+      border-radius: 20px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 0 #172554;
+    }
+
+    .turn-player-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .turn-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 1.4rem;
+      font-weight: 900;
+      border: 3px solid #fff;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .turn-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #bfdbfe;
+      font-weight: 800;
+    }
+
+    .turn-name {
+      font-size: 1.35rem;
+      font-weight: 900;
+      line-height: 1.15;
+    }
+
+    .turn-badges {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .status-badge {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .double-badge {
+      background: #fbbf24;
+      color: #1e293b;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 900;
+      animation: pulseBadge 1.2s infinite;
+    }
+
+    @keyframes pulseBadge {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    /* 3D Wheel Stage */
+    .wheel-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0 6px;
+      perspective: 1100px;
+    }
+
+    .wheel-3d-wrapper {
+      position: relative;
+      width: min(470px, 86vw);
+      height: min(470px, 86vw);
+      display: grid;
+      place-items: center;
+      transform: rotateX(8deg);
+      transform-style: preserve-3d;
+      transition: transform 0.4s ease;
+    }
+
+    .wheel-3d-wrapper:hover {
+      transform: rotateX(4deg) scale(1.01);
+    }
+
+    /* 3D Base Rim & Pedestal */
+    .wheel-pedestal {
+      position: absolute;
+      bottom: -18px;
+      width: 58%;
+      height: 28px;
+      background: linear-gradient(180deg, #334155, #0f172a);
+      border-radius: 50%;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.35);
+      z-index: 1;
+    }
+
+    .wheel-outer-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, #f59e0b, #ef4444, #8b5cf6, #3b82f6, #10b981, #f59e0b);
+      padding: 12px;
+      box-shadow:
+        0 14px 0 #1e293b,
+        0 22px 38px rgba(15, 23, 42, 0.28),
+        inset 0 4px 10px rgba(255, 255, 255, 0.65);
+      z-index: 2;
+    }
+
+    .wheel-inner-surface {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #0f172a;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.6);
+    }
+
+    #wheelCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 50%;
+    }
+
+    /* Glossy 3D Dome Overlay */
+    .wheel-gloss {
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.06) 45%, rgba(0, 0, 0, 0.16) 100%);
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    /* Spring Pointer */
+    .wheel-pointer {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      filter: drop-shadow(0 6px 8px rgba(15, 23, 42, 0.4));
+      transform-origin: 50% 18%;
+    }
+
+    .wheel-pointer.tick {
+      animation: pointerBounce 0.14s ease-out;
+    }
+
+    @keyframes pointerBounce {
+      0% { transform: translateX(-50%) rotate(0deg); }
+      40% { transform: translateX(-50%) rotate(-24deg); }
+      100% { transform: translateX(-50%) rotate(0deg); }
+    }
+
+    /* Center Spin Hub Button */
+    .wheel-hub {
+      position: absolute;
+      z-index: 8;
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      border: 5px solid #fbbf24;
+      background: radial-gradient(circle at 35% 30%, #ffffff, #e2e8f0);
+      box-shadow: 0 6px 0 #94a3b8, 0 12px 20px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      font-weight: 900;
+      color: #0f172a;
+      transition: transform 0.12s ease;
+    }
+
+    .wheel-hub:hover:not(:disabled) {
+      transform: scale(1.07);
+    }
+
+    .wheel-hub:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
+    .wheel-hub:disabled {
+      cursor: not-allowed;
+      opacity: 0.85;
+    }
+
+    .wheel-hub-main {
+      font-size: 1.05rem;
+      line-height: 1;
+    }
+
+    .wheel-hub-sub {
+      font-size: 0.68rem;
+      color: #d97706;
+      margin-top: 3px;
+    }
+
+    .wheel-controls {
+      margin-top: 26px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    /* Live Scoreboard */
+    .scoreboard-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .score-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      background: #f8fafc;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .score-row.active-turn {
+      border-color: #2563eb;
+      background: #eff6ff;
+      box-shadow: 0 4px 0 #bfdbfe;
+      transform: scale(1.015);
+    }
+
+    .score-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .rank-medal {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      font-weight: 900;
+      font-size: 0.95rem;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .rank-1 { background: #fef08a; color: #854d0e; }
+    .rank-2 { background: #e2e8f0; color: #1e293b; }
+    .rank-3 { background: #fed7aa; color: #9a3412; }
+
+    .score-name {
+      font-weight: 800;
+      font-size: 1rem;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .score-meta {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    .score-points {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #15803d;
+      background: #dcfce7;
+      border: 2px solid #86efac;
+      padding: 5px 12px;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 200;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 760px;
+      border-radius: 28px;
+      border: 4px solid #fbbf24;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+      animation: modalPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes modalPop {
+      0% { opacity: 0; transform: scale(0.88) translateY(20px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      padding: 16px 22px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      padding: 14px 24px;
+      background: #f8fafc;
+      border-top: 2px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .level-pill {
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .lvl-mudah { background: #dcfce7; color: #166534; }
+    .lvl-sedang { background: #fef3c7; color: #92400e; }
+    .lvl-sulit { background: #fee2e2; color: #991b1b; }
+
+    .question-box {
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 18px;
+      padding: 18px 20px;
+      font-size: clamp(1.08rem, 2.1vw, 1.35rem);
+      font-weight: 800;
+      line-height: 1.5;
+      color: #0f172a;
+      margin: 12px 0 18px;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .option-btn {
+      border: 3px solid #cbd5e1;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 14px 16px;
+      text-align: left;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #0f172a;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.14s ease;
+      box-shadow: 0 4px 0 #cbd5e1;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #2563eb;
+      background: #eff6ff;
+      transform: translateY(-2px);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-letter {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: #e2e8f0;
+      color: #1e293b;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .option-btn.correct {
+      background: #16a34a;
+      border-color: #15803d;
+      color: #fff;
+      box-shadow: 0 4px 0 #14532d;
+    }
+
+    .option-btn.correct .option-letter {
+      background: #fff;
+      color: #16a34a;
+    }
+
+    .option-btn.wrong {
+      background: #dc2626;
+      border-color: #b91c1c;
+      color: #fff;
+      box-shadow: 0 4px 0 #7f1d1d;
+    }
+
+    .option-btn.wrong .option-letter {
+      background: #fff;
+      color: #dc2626;
+    }
+
+    .feedback-card {
+      margin-top: 16px;
+      border-radius: 16px;
+      padding: 14px 18px;
+      border: 2px solid;
+    }
+
+    .feedback-card.ok {
+      background: #f0fdf4;
+      border-color: #4ade80;
+      color: #14532d;
+    }
+
+    .feedback-card.no {
+      background: #fef2f2;
+      border-color: #f87171;
+      color: #7f1d1d;
+    }
+
+    .feedback-title {
+      font-size: 1.1rem;
+      font-weight: 900;
+      margin: 0 0 6px;
+    }
+
+    .feedback-desc {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    /* Timer Pill */
+    .timer-display {
+      background: rgba(15, 23, 42, 0.45);
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 1rem;
+      color: #fde047;
+    }
+
+    .timer-display.urgent {
+      background: #dc2626;
+      color: #fff;
+      animation: pulseBadge 0.6s infinite;
+    }
+
+    /* Bonus Surprise Modal */
+    .bonus-showcase {
+      text-align: center;
+      padding: 16px 10px;
+    }
+
+    .bonus-emoji {
+      font-size: 4.2rem;
+      display: inline-block;
+      animation: bounceGift 0.9s infinite alternate;
+    }
+
+    @keyframes bounceGift {
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(-10px) scale(1.08); }
+    }
+
+    /* End Screen: 3D Podium & Reflection */
+    .podium-stage {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 14px;
+      margin: 26px auto 28px;
+      max-width: 680px;
+      padding: 0 10px;
+    }
+
+    .podium-col {
+      flex: 1;
+      max-width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .podium-player-tag {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      width: 100%;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+    }
+
+    .podium-crown {
+      font-size: 2rem;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .podium-name {
+      font-weight: 900;
+      font-size: 1rem;
+      color: #0f172a;
+      word-break: break-word;
+    }
+
+    .podium-score {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #16a34a;
+      margin-top: 2px;
+    }
+
+    .podium-block {
+      width: 100%;
+      border-radius: 18px 18px 8px 8px;
+      color: #fff;
+      font-weight: 900;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 6px 0 rgba(255, 255, 255, 0.35), 0 8px 0 rgba(15, 23, 42, 0.2);
+    }
+
+    .podium-1 {
+      height: 150px;
+      background: linear-gradient(180deg, #fbbf24, #d97706);
+    }
+
+    .podium-2 {
+      height: 112px;
+      background: linear-gradient(180deg, #94a3b8, #475569);
+    }
+
+    .podium-3 {
+      height: 86px;
+      background: linear-gradient(180deg, #fb923c, #c2410c);
+    }
+
+    .end-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 860px) {
+      .end-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .summary-list {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 8px;
+      font-size: 0.94rem;
+      line-height: 1.5;
+      color: #1e293b;
+      font-weight: 600;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .checklist-item input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: #16a34a;
+    }
+
+    .reflection-textarea {
+      width: 100%;
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      resize: vertical;
+      min-height: 82px;
+      margin-top: 8px;
+      outline: none;
+    }
+
+    .reflection-textarea:focus {
+      border-color: #2563eb;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%) translateY(90px);
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+      z-index: 500;
+      opacity: 0;
+      transition: all 0.28s ease;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confettiCanvas"></canvas>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- TOP HEADER -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">🎡</div>
+        <div>
+          <h1 class="brand-title">RODA KEBERUNTUNGAN – <span>SISTEM PENCERNAAN MANUSIA</span></h1>
+          <p class="brand-sub">Media Pembelajaran IPA Interaktif • Individu &amp; Kelompok • Proyektor &amp; HP</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button type="button" class="btn btn-accent" id="btnToggleSound" onclick="toggleSound()">
+          <span id="soundIcon">🔊</span> <span id="soundText">Suara Aktif</span>
+        </button>
+        <button type="button" class="btn btn-soft hidden" id="btnBackSetup" onclick="confirmResetToSetup()">
+          ⚙️ Pengaturan
+        </button>
+        <button type="button" class="btn btn-purple hidden" id="btnEndGameNow" onclick="finishGame()">
+          🏆 Podium &amp; Refleksi
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- COLLAPSIBLE QUICK GUIDE (VISIBLE ON HOME & GAME) -->
+    <section class="guide-box" aria-label="Panduan singkat cara bermain">
+      <div class="guide-header">
+        <div class="guide-title-wrap">
+          <span class="guide-pill">PANDUAN SINGKAT</span>
+          <h2 class="guide-title">Cara Bermain Roda Keberuntungan Sistem Pencernaan</h2>
+        </div>
+        <button type="button" class="btn btn-soft" id="btnToggleGuide" onclick="toggleGuide()" aria-expanded="true">
+          Sembunyikan Panduan
+        </button>
+      </div>
+
+      <div class="guide-content" id="guideContent">
+        <div class="guide-step">
+          <div class="guide-num">1</div>
+          <p><strong>Atur Peserta:</strong> Pilih mode <em>Individu</em> (1–6 pemain) atau <em>Kelompok</em> (2–6 kelompok), lalu isi nama peserta.</p>
+        </div>
+        <div class="guide-step">
+          <div class="guide-num">2</div>
+          <p><strong>Putar Roda 3D:</strong> Tekan <em>Putar Roda</em> (atau tombol <strong>Spasi</strong>) untuk mendapatkan 1 dari 6 kategori atau segmen <em>Bonus</em>.</p>
+        </div>
+        <div class="guide-step">
+          <div class="guide-num">3</div>
+          <p><strong>Jawab Soal IPA:</strong> Pilih jawaban A, B, C, atau D. Dapatkan poin level, bonus kecepatan, dan streak beruntun!</p>
+        </div>
+        <div class="guide-step">
+          <div class="guide-num">4</div>
+          <p><strong>Podium &amp; Refleksi:</strong> Lihat juara di podium 3D meriah, rayakan konfeti, dan isi refleksi pemahaman materi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCREEN 1: SETUP & CONFIGURATION
+         ========================================================= -->
+    <section id="setupScreen">
+      <div class="setup-grid">
+        <!-- Left: Mode & Participant Manager -->
+        <div class="card-3d">
+          <h2 class="section-heading">👥 1. Pilih Mode &amp; Daftar Peserta</h2>
+
+          <div class="mode-switch">
+            <button type="button" class="mode-card active" id="modeIndividuBtn" onclick="setGameMode('individu')">
+              <div class="mode-card-title">🧑‍🎓 Mode Individu</div>
+              <p class="mode-card-desc">1 – 6 pemain bermain bergantian mengumpulkan skor tertinggi.</p>
+            </button>
+            <button type="button" class="mode-card" id="modeKelompokBtn" onclick="setGameMode('kelompok')">
+              <div class="mode-card-title">🤝 Mode Kelompok</div>
+              <p class="mode-card-desc">2 – 6 kelompok berdiskusi menjawab tantangan kelas.</p>
+            </button>
+          </div>
+
+          <div class="participant-toolbar">
+            <span class="setting-label" style="margin:0;" id="participantCountLabel">Daftar Pemain (2 / 6):</span>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-soft" onclick="fillExampleNames()">✨ Isi Contoh Nama</button>
+              <button type="button" class="btn btn-primary" id="btnAddParticipant" onclick="addParticipant()">➕ Tambah</button>
+            </div>
+          </div>
+
+          <div class="participant-list" id="participantList"></div>
+        </div>
+
+        <!-- Right: Level, Rounds, Timer & Categories -->
+        <div class="card-3d">
+          <h2 class="section-heading">⚙️ 2. Pengaturan Tantangan</h2>
+
+          <div class="setting-group">
+            <label class="setting-label">Tingkat Kesulitan Soal:</label>
+            <div class="pill-options" id="difficultyOptions">
+              <button type="button" class="pill-choice active" data-val="semua" onclick="selectPill('difficulty', 'semua', this)">🌈 Semua Level</button>
+              <button type="button" class="pill-choice" data-val="Mudah" onclick="selectPill('difficulty', 'Mudah', this)">🟢 Mudah (+100)</button>
+              <button type="button" class="pill-choice" data-val="Sedang" onclick="selectPill('difficulty', 'Sedang', this)">🟡 Sedang (+150)</button>
+              <button type="button" class="pill-choice" data-val="Sulit" onclick="selectPill('difficulty', 'Sulit', this)">🔴 Sulit (+200)</button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label class="setting-label">Jumlah Putaran per Peserta:</label>
+            <div class="pill-options" id="roundsOptions">
+              <button type="button" class="pill-choice" data-val="2" onclick="selectPill('rounds', 2, this)">2 Putaran</button>
+              <button type="button" class="pill-choice active" data-val="3" onclick="selectPill('rounds', 3, this)">3 Putaran</button>
+              <button type="button" class="pill-choice" data-val="5" onclick="selectPill('rounds', 5, this)">5 Putaran</button>
+              <button type="button" class="pill-choice" data-val="0" onclick="selectPill('rounds', 0, this)">♾️ Bebas</button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label class="setting-label">Timer Jawab Soal:</label>
+            <div class="pill-options" id="timerOptions">
+              <button type="button" class="pill-choice" data-val="0" onclick="selectPill('timer', 0, this)">Tanpa Batas</button>
+              <button type="button" class="pill-choice" data-val="20" onclick="selectPill('timer', 20, this)">⏱️ 20 Detik</button>
+              <button type="button" class="pill-choice active" data-val="30" onclick="selectPill('timer', 30, this)">⏱️ 30 Detik</button>
+              <button type="button" class="pill-choice" data-val="45" onclick="selectPill('timer', 45, this)">⏱️ 45 Detik</button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label class="setting-label">6 Segmen Roda Keberuntungan:</label>
+            <div class="category-preview-list" id="categoryPreviewList"></div>
+          </div>
+
+          <button type="button" class="btn btn-success btn-lg" style="width:100%; margin-top:8px;" onclick="startGame()">
+            🚀 MULAI PERMAINAN SEKARANG!
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCREEN 2: ACTIVE GAMEPLAY (WHEEL + LIVE SCOREBOARD)
+         ========================================================= -->
+    <section id="gameScreen" class="hidden">
+      <div class="game-layout">
+        <!-- Left: Turn Banner & 3D Spin Wheel -->
+        <div class="card-3d">
+          <div class="turn-banner">
+            <div class="turn-player-info">
+              <div class="turn-avatar" id="turnAvatar">1</div>
+              <div>
+                <div class="turn-label" id="turnModeLabel">GILIRAN PEMAIN AKTIF</div>
+                <div class="turn-name" id="turnPlayerName">Peserta 1</div>
+              </div>
+            </div>
+
+            <div class="turn-badges">
+              <span class="status-badge" id="roundIndicator">Putaran 1 / 3</span>
+              <span class="status-badge" id="streakIndicator">🔥 Streak: 0</span>
+              <span class="double-badge hidden" id="doubleScoreIndicator">⚡ 2x POIN AKTIF!</span>
+            </div>
+          </div>
+
+          <div class="wheel-stage">
+            <div class="wheel-3d-wrapper">
+              <!-- Spring Pointer SVG -->
+              <div class="wheel-pointer" id="wheelPointer">
+                <svg width="56" height="62" viewBox="0 0 56 62" fill="none">
+                  <path d="M28 60L6 16C3 10 7 3 14 3H42C49 3 53 10 50 16L28 60Z" fill="#ef4444" stroke="#ffffff" stroke-width="4"/>
+                  <circle cx="28" cy="16" r="7" fill="#fde047"/>
+                </svg>
+              </div>
+
+              <div class="wheel-outer-ring">
+                <div class="wheel-inner-surface">
+                  <canvas id="wheelCanvas" width="520" height="520"></canvas>
+                </div>
+              </div>
+
+              <div class="wheel-gloss"></div>
+
+              <button type="button" class="wheel-hub" id="hubSpinBtn" onclick="spinWheel()" title="Klik atau tekan Spasi untuk memutar roda">
+                <span class="wheel-hub-main">PUTAR</span>
+                <span class="wheel-hub-sub">SPASI</span>
+              </button>
+
+              <div class="wheel-pedestal"></div>
+            </div>
+
+            <div class="wheel-controls">
+              <button type="button" class="btn btn-success btn-lg" id="mainSpinBtn" onclick="spinWheel()">
+                🎯 PUTAR RODA KEBERUNTUNGAN
+              </button>
+              <button type="button" class="btn btn-soft" id="manualNextBtn" onclick="manualNextTurn()">
+                ⏭️ Pindah Giliran
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Live Scoreboard & Stats -->
+        <aside class="card-3d">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+            <h2 class="section-heading" style="margin:0;">🏆 Papan Skor Langsung</h2>
+            <span style="font-size:0.8rem; font-weight:800; color:#2563eb; background:#eff6ff; padding:4px 10px; border-radius:999px;" id="remainingQuestionsBadge">
+              Bank Soal: 36
+            </span>
+          </div>
+
+          <div class="scoreboard-list" id="scoreboardList"></div>
+
+          <div style="margin-top:16px; padding:12px; background:#f8fafc; border:2px dashed #cbd5e1; border-radius:14px; font-size:0.82rem; color:#475569; font-weight:700; line-height:1.45;">
+            💡 <strong>Aturan Skor:</strong> Mudah +100, Sedang +150, Sulit +200, Bonus Cepat hingga +50, Streak Benar +25/beruntun, dan 2x Poin dari segmen Bonus!
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCREEN 3: VICTORY PODIUM, STATS & LEARNING REFLECTION
+         ========================================================= -->
+    <section id="endScreen" class="hidden">
+      <div class="card-3d" style="text-align:center;">
+        <div style="font-size:2.6rem; line-height:1;">🎉🏆🎉</div>
+        <h2 style="margin:6px 0 4px; font-size:clamp(1.5rem, 3vw, 2.2rem); font-weight:900; color:#0f172a;">
+          SELAMAT KEPADA PARA JUARA!
+        </h2>
+        <p style="margin:0; font-size:1rem; font-weight:700; color:#475569;">
+          Hasil Akhir Roda Keberuntungan – Sistem Pencernaan Manusia
+        </p>
+
+        <!-- 3D Podium -->
+        <div class="podium-stage" id="podiumStage"></div>
+
+        <!-- Full Rankings & Stats -->
+        <div style="max-width:760px; margin:0 auto; text-align:left;">
+          <h3 class="section-heading">📊 Statistik Lengkap Peserta</h3>
+          <div class="scoreboard-list" id="finalStatsList"></div>
+        </div>
+      </div>
+
+      <!-- Educational Summary & Student Self-Reflection -->
+      <div class="end-grid">
+        <div class="card-3d">
+          <h3 class="section-heading">🧠 Kesimpulan Materi Sistem Pencernaan</h3>
+          <ul class="summary-list">
+            <li><strong>Urutan Saluran Pencernaan:</strong> Mulut → Kerongkongan (esofagus) → Lambung → Usus Halus → Usus Besar → Rektum &amp; Anus.</li>
+            <li><strong>Pencernaan Mekanik &amp; Kimiawi:</strong> Mekanik dilakukan oleh gigi dan gerak peristaltik otot, sedangkan kimiawi dibantu oleh enzim pencernaan.</li>
+            <li><strong>Peran Enzim Utama:</strong> Amilase/Ptialin (karbohidrat → glukosa), Pepsin &amp; Tripsin (protein → asam amino), Lipase (lemak → asam lemak &amp; gliserol).</li>
+            <li><strong>Penyerapan Sari Makanan:</strong> Terjadi secara maksimal di usus halus (ileum) yang memiliki jonjot usus (vili), sedangkan usus besar menyerap air dan membentuk feses.</li>
+            <li><strong>Menjaga Kesehatan Pencernaan:</strong> Konsumsi makanan bergizi seimbang kaya serat, minum air putih cukup, makan teratur, dan menjaga kebersihan makanan.</li>
+          </ul>
+        </div>
+
+        <div class="card-3d">
+          <h3 class="section-heading">📝 Refleksi Pembelajaran Siswa</h3>
+          <p style="margin:0 0 12px; font-size:0.9rem; font-weight:600; color:#475569;">
+            Centang pencapaian belajarmu hari ini dan tuliskan hal paling menarik yang kamu pelajari:
+          </p>
+
+          <label class="checklist-item">
+            <input type="checkbox" checked />
+            <span>Saya dapat mengurutkan organ-organ sistem pencernaan manusia dengan benar.</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" />
+            <span>Saya memahami perbedaan pencernaan mekanik dan pencernaan kimiawi beserta enzimnya.</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" />
+            <span>Saya mengetahui cara mencegah gangguan pencernaan melalui pola hidup bersih dan gizi seimbang.</span>
+          </label>
+
+          <label class="setting-label" style="margin-top:12px;">Catatan Refleksi Kelas / Siswa:</label>
+          <textarea class="reflection-textarea" id="reflectionNotes" placeholder="Tuliskan organ atau enzim pencernaan yang paling menarik perhatianmu hari ini..."></textarea>
+
+          <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;">
+            <button type="button" class="btn btn-success btn-lg" style="flex:1;" onclick="playAgainSamePlayers()">
+              🔄 Main Lagi (Peserta Sama)
+            </button>
+            <button type="button" class="btn btn-primary btn-lg" style="flex:1;" onclick="resetToSetup()">
+              🏠 Kembali ke Pengaturan
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================
+       MODAL 1: QUESTION MODAL
+       ========================================================= -->
+  <div id="questionModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header" id="qModalHeader" style="background:#2563eb;">
+        <div>
+          <div style="font-size:0.78rem; font-weight:800; opacity:0.9; text-transform:uppercase;" id="qModalPlayerTag">
+            Giliran: Peserta 1
+          </div>
+          <div style="font-size:1.25rem; font-weight:900;" id="qModalCategoryTitle">
+            🫁 Organ Pencernaan
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="level-pill lvl-mudah" id="qModalLevelBadge">Mudah</span>
+          <span class="timer-display hidden" id="qModalTimer">⏱️ 30d</span>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="question-box" id="qModalText">Pertanyaan akan muncul di sini...</div>
+        <div class="options-grid" id="qModalOptions"></div>
+
+        <div class="feedback-card ok hidden" id="qModalFeedback">
+          <h4 class="feedback-title" id="qFeedbackTitle">Benar Sekali!</h4>
+          <p class="feedback-desc" id="qFeedbackDesc">Penjelasan materi...</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <span style="font-size:0.85rem; font-weight:700; color:#64748b;" id="qModalHint">
+          Pilih salah satu jawaban A, B, C, atau D
+        </span>
+        <button type="button" class="btn btn-primary btn-lg hidden" id="qModalNextBtn" onclick="closeQuestionModalAndAdvance()">
+          Lanjutkan Permainan ➡️
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 2: BONUS / SURPRISE SEGMENT MODAL
+       ========================================================= -->
+  <div id="bonusModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width:540px;">
+      <div class="modal-header" style="background:linear-gradient(135deg, #f59e0b, #ea580c);">
+        <div style="font-size:1.25rem; font-weight:900;">🎁 SEGMEN BONUS KEBERUNTUNGAN!</div>
+        <span style="font-size:0.85rem; font-weight:800; background:rgba(0,0,0,0.2); padding:4px 10px; border-radius:999px;" id="bonusPlayerBadge">
+          Peserta 1
+        </span>
+      </div>
+
+      <div class="modal-body">
+        <div class="bonus-showcase">
+          <div class="bonus-emoji" id="bonusEmoji">🎁</div>
+          <h3 style="margin:10px 0 6px; font-size:1.45rem; font-weight:900; color:#0f172a;" id="bonusTitle">
+            Hadiah Kejutan!
+          </h3>
+          <p style="margin:0; font-size:1rem; font-weight:600; color:#475569; line-height:1.5;" id="bonusDesc">
+            Deskripsi hadiah kejutan...
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content:center;">
+        <button type="button" class="btn btn-accent btn-lg" id="bonusActionBtn">
+          Ambil Hadiah &amp; Lanjut! ✨
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================================
+       1. WEB AUDIO API SOUND ENGINE (ZERO EXTERNAL FILES)
+       ===================================================================== */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      tone(freq, type = 'sine', duration = 0.14, gainVal = 0.15, delay = 0) {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime + delay;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(gainVal, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+      }
+
+      tick() {
+        this.tone(760, 'triangle', 0.045, 0.14, 0);
+      }
+
+      landCategory() {
+        this.tone(523.25, 'sine', 0.14, 0.18, 0);
+        this.tone(659.25, 'sine', 0.14, 0.18, 0.09);
+        this.tone(783.99, 'triangle', 0.25, 0.2, 0.18);
+      }
+
+      correct() {
+        [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+          this.tone(f, 'triangle', 0.2, 0.18, i * 0.08);
+        });
+      }
+
+      wrong() {
+        this.tone(240, 'sawtooth', 0.22, 0.13, 0);
+        this.tone(185, 'sawtooth', 0.3, 0.13, 0.16);
+      }
+
+      bonus() {
+        [587.33, 739.99, 880, 1174.66].forEach((f, i) => {
+          this.tone(f, 'sine', 0.18, 0.18, i * 0.07);
+        });
+      }
+
+      victory() {
+        const notes = [523.25, 523.25, 659.25, 783.99, 659.25, 1046.5];
+        notes.forEach((f, i) => {
+          this.tone(f, 'triangle', 0.26, 0.2, i * 0.13);
+        });
+      }
+    }
+
+    const sfx = new SoundEngine();
+
+    /* =====================================================================
+       2. WHEEL CATEGORIES & 36 DIGESTIVE SYSTEM MULTIPLE CHOICE QUESTIONS
+       ===================================================================== */
+    const WHEEL_CATEGORIES = [
+      { id: 'organ', label: 'Organ Pencernaan', shortLabel: 'Organ', icon: '🫁', color: '#ef4444' },
+      { id: 'enzim', label: 'Enzim & Fungsinya', shortLabel: 'Enzim', icon: '🧪', color: '#8b5cf6' },
+      { id: 'proses', label: 'Proses Pencernaan', shortLabel: 'Proses', icon: '⚙️', color: '#2563eb' },
+      { id: 'gangguan', label: 'Gangguan Pencernaan', shortLabel: 'Gangguan', icon: '🩺', color: '#ec4899' },
+      { id: 'nutrisi', label: 'Nutrisi & Gizi', shortLabel: 'Nutrisi', icon: '🥗', color: '#16a34a' },
+      { id: 'bonus', label: 'Bonus Poin', shortLabel: 'Bonus!', icon: '🎁', color: '#f59e0b' }
+    ];
+
+    const AVATAR_COLORS = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#8b5cf6', '#ec4899'];
+
+    const QUESTION_BANK = [
+      // --- 1. ORGAN PENCERNAAN (7 Soal) ---
+      {
+        id: 1, category: 'organ', level: 'Mudah',
+        q: 'Urutan saluran pencernaan manusia dari awal hingga akhir yang paling tepat adalah...',
+        opts: [
+          'Mulut → Kerongkongan → Lambung → Usus Halus → Usus Besar → Anus',
+          'Mulut → Tenggorokan → Lambung → Usus Besar → Usus Halus → Anus',
+          'Mulut → Kerongkongan → Usus Halus → Lambung → Usus Besar → Anus',
+          'Mulut → Lambung → Kerongkongan → Usus Halus → Usus Besar → Anus'
+        ],
+        ans: 0,
+        exp: 'Makanan masuk melalui mulut, melewati kerongkongan (esofagus), dicerna di lambung dan usus halus, diserap airnya di usus besar, lalu sisa pencernaan dikeluarkan melalui anus.'
+      },
+      {
+        id: 2, category: 'organ', level: 'Mudah',
+        q: 'Organ pencernaan yang berfungsi menghubungkan rongga mulut dengan lambung adalah...',
+        opts: ['Tenggorokan (trakea)', 'Kerongkongan (esofagus)', 'Usus dua belas jari', 'Pankreas'],
+        ans: 1,
+        exp: 'Kerongkongan (esofagus) merupakan saluran berotot yang mendorong makanan dari faring menuju lambung melalui gerak peristaltik.'
+      },
+      {
+        id: 3, category: 'organ', level: 'Sedang',
+        q: 'Penyerapan sebagian besar sari-sari makanan ke dalam pembuluh darah terjadi di organ...',
+        opts: ['Lambung', 'Usus besar', 'Usus halus', 'Kantung empedu'],
+        ans: 2,
+        exp: 'Usus halus (terutama bagian ileum/usus penyerapan) memiliki jonjot-jonjot usus (vili) yang memperluas bidang penyerapan sari makanan.'
+      },
+      {
+        id: 4, category: 'organ', level: 'Sedang',
+        q: 'Organ kelenjar pencernaan yang menghasilkan cairan empedu untuk mengemulsikan lemak adalah...',
+        opts: ['Hati', 'Limpa', 'Lambung', 'Kelenjar ludah'],
+        ans: 0,
+        exp: 'Hati menghasilkan cairan empedu yang ditampung di kantung empedu dan dialirkan ke usus dua belas jari untuk memecah lemak menjadi butiran halus.'
+      },
+      {
+        id: 5, category: 'organ', level: 'Sedang',
+        q: 'Fungsi utama usus besar (kolon) dalam sistem pencernaan manusia adalah...',
+        opts: [
+          'Mencerna protein menjadi asam amino',
+          'Menyerap kembali air dan garam mineral dari sisa makanan',
+          'Menghasilkan enzim amilase dan lipase',
+          'Mengubah glukosa menjadi glikogen'
+        ],
+        ans: 1,
+        exp: 'Usus besar mengatur kadar air pada sisa makanan (feses) serta dibantu bakteri Escherichia coli untuk membusukkan sisa makanan.'
+      },
+      {
+        id: 6, category: 'organ', level: 'Sulit',
+        q: 'Tiga bagian berurutan penyusun usus halus manusia dari pangkal lambung menuju usus besar adalah...',
+        opts: [
+          'Ileum – Jejunum – Duodenum',
+          'Duodenum – Jejunum – Ileum',
+          'Jejunum – Duodenum – Ileum',
+          'Sekum – Kolon – Rektum'
+        ],
+        ans: 1,
+        exp: 'Usus halus terdiri atas duodenum (usus dua belas jari), jejunum (usus kosong), dan ileum (usus penyerapan).'
+      },
+      {
+        id: 7, category: 'organ', level: 'Sulit',
+        q: 'Katup yang mencegah makanan masuk ke saluran pernapasan (trakea) saat kita menelan disebut...',
+        opts: ['Sfingter pilorus', 'Epiglotis', 'Vili usus', 'Apendiks'],
+        ans: 1,
+        exp: 'Epiglotis adalah katup tulang rawan elastis yang menutup pangkal tenggorokan (laring) ketika menelan makanan agar tidak tersedak.'
+      },
+
+      // --- 2. ENZIM & FUNGSINYA (7 Soal) ---
+      {
+        id: 8, category: 'enzim', level: 'Mudah',
+        q: 'Enzim ptialin (amilase) yang terdapat pada air ludah di rongga mulut berfungsi mengubah...',
+        opts: [
+          'Protein menjadi pepton',
+          'Lemak menjadi asam lemak',
+          'Amilum (zat tepung) menjadi gula sederhana (maltosa)',
+          'Susu menjadi kasein'
+        ],
+        ans: 2,
+        exp: 'Enzim ptialin/amilase dalam saliva mulai memecah karbohidrat kompleks (amilum) menjadi gula sederhana (maltosa) sejak di dalam mulut.'
+      },
+      {
+        id: 9, category: 'enzim', level: 'Mudah',
+        q: 'Enzim pada lambung yang berfungsi memecah protein menjadi pepton adalah...',
+        opts: ['Amilase', 'Pepsin', 'Lipase', 'Maltase'],
+        ans: 1,
+        exp: 'Pepsin bekerja dalam suasana asam di lambung untuk menghidrolisis protein menjadi molekul peptida pendek (pepton).'
+      },
+      {
+        id: 10, category: 'enzim', level: 'Sedang',
+        q: 'Enzim renin yang dihasilkan oleh dinding lambung berperan untuk...',
+        opts: [
+          'Mengendapkan protein susu (kasein)',
+          'Membunuh kuman penyakit yang terbawa makanan',
+          'Mengubah lemak menjadi gliserol',
+          'Mengubah maltosa menjadi glukosa'
+        ],
+        ans: 0,
+        exp: 'Enzim renin menggumpalkan protein kasein pada susu agar lebih mudah dicerna lebih lanjut di dalam lambung.'
+      },
+      {
+        id: 11, category: 'enzim', level: 'Sedang',
+        q: 'Enzim lipase yang disekresikan pankreas ke usus dua belas jari berfungsi mengubah...',
+        opts: [
+          'Amilum menjadi maltosa',
+          'Pepton menjadi asam amino',
+          'Lemak menjadi asam lemak dan gliserol',
+          'Sukrosa menjadi glukosa dan fruktosa'
+        ],
+        ans: 2,
+        exp: 'Lipase memecah lemak yang telah diemulsikan oleh cairan empedu menjadi asam lemak dan gliserol agar dapat diserap tubuh.'
+      },
+      {
+        id: 12, category: 'enzim', level: 'Sedang',
+        q: 'Asam klorida (HCl) pada getah lambung memiliki fungsi penting berikut, KECUALI...',
+        opts: [
+          'Membunuh mikroorganisme berbahaya dalam makanan',
+          'Mengaktifkan pepsinogen menjadi enzim pepsin',
+          'Mengasamkan makanan di lambung',
+          'Mengubah amilum menjadi glukosa secara langsung'
+        ],
+        ans: 3,
+        exp: 'Asam klorida (HCl) membunuh kuman, mengasamkan makanan, dan mengaktifkan pepsinogen menjadi pepsin, bukan memecah amilum.'
+      },
+      {
+        id: 13, category: 'enzim', level: 'Sulit',
+        q: 'Tiga enzim pencernaan utama yang dihasilkan oleh pankreas dan dialirkan ke duodenum adalah...',
+        opts: [
+          'Pepsin, Renin, dan Ptialin',
+          'Amilase, Tripsin, dan Lipase',
+          'Maltase, Laktase, dan Sukrase',
+          'Pepsinogen, HCl, dan Empedu'
+        ],
+        ans: 1,
+        exp: 'Getah pankreas mengandung amilase (pencerna karbohidrat), tripsin (pencerna protein), dan lipase (pencerna lemak).'
+      },
+      {
+        id: 14, category: 'enzim', level: 'Sulit',
+        q: 'Mengapa enzim ptialin dari mulut tidak lagi aktif bekerja ketika makanan sudah tiba di lambung?',
+        opts: [
+          'Suhu di dalam lambung terlalu dingin',
+          'Lingkungan lambung sangat asam (pH rendah) akibat HCl',
+          'Di lambung tidak terdapat karbohidrat',
+          'Enzim ptialin habis diserap kerongkongan'
+        ],
+        ans: 1,
+        exp: 'Enzim bekerja pada rentang pH tertentu. Ptialin aktif pada pH netral di mulut dan menjadi tidak aktif saat terkena asam lambung (HCl).'
+      },
+
+      // --- 3. PROSES PENCERNAAN MEKANIK & KIMIAWI (7 Soal) ---
+      {
+        id: 15, category: 'proses', level: 'Mudah',
+        q: 'Proses mengunyah makanan menggunakan gigi di dalam mulut termasuk pencernaan...',
+        opts: ['Kimiawi', 'Mekanik', 'Biologis', 'Fermentasi'],
+        ans: 1,
+        exp: 'Pencernaan mekanik mengubah ukuran makanan menjadi lebih kecil secara fisik tanpa melibatkan perubahan struktur kimia oleh enzim.'
+      },
+      {
+        id: 16, category: 'proses', level: 'Mudah',
+        q: 'Gerakan meremas dan mendorong makanan oleh dinding kerongkongan menuju lambung disebut gerak...',
+        opts: ['Refleks', 'Peristaltik', 'Rotasi', 'Difusi'],
+        ans: 1,
+        exp: 'Gerak peristaltik adalah kontraksi dan relaksasi otot polos secara bergelombang untuk mendorong bolus makanan menuju lambung.'
+      },
+      {
+        id: 17, category: 'proses', level: 'Sedang',
+        q: 'Organ pencernaan tempat berlangsungnya pencernaan mekanik sekaligus pencernaan kimiawi adalah...',
+        opts: [
+          'Kerongkongan dan usus besar',
+          'Mulut dan lambung',
+          'Usus besar dan anus',
+          'Hati dan kantung empedu'
+        ],
+        ans: 1,
+        exp: 'Di mulut terjadi pengunyahan (mekanik) & kerja ptialin (kimiawi); di lambung terjadi pengadukan otot lambung (mekanik) & kerja pepsin/renin/HCl (kimiawi).'
+      },
+      {
+        id: 18, category: 'proses', level: 'Sedang',
+        q: 'Bubur makanan yang telah dicerna secara mekanik dan kimiawi di dalam lambung disebut...',
+        opts: ['Bolus', 'Kim (chyme)', 'Vili', 'Feses'],
+        ans: 1,
+        exp: 'Gumpalan makanan dari mulut disebut bolus, sedangkan bubur asam hasil pencernaan di lambung disebut kim (chyme).'
+      },
+      {
+        id: 19, category: 'proses', level: 'Sedang',
+        q: 'Proses pembusukan sisa makanan di usus besar dibantu oleh bakteri menguntungkan bernama...',
+        opts: ['Salmonella typhi', 'Escherichia coli', 'Vibrio cholerae', 'Mycobacterium'],
+        ans: 1,
+        exp: 'Bakteri Escherichia coli membantu membusukkan sisa makanan di usus besar sekaligus berperan dalam pembentukan vitamin K.'
+      },
+      {
+        id: 20, category: 'proses', level: 'Sulit',
+        q: 'Pernyataan yang paling tepat membedakan pencernaan mekanik dan pencernaan kimiawi adalah...',
+        opts: [
+          'Mekanik terjadi hanya di usus besar, kimiawi hanya di mulut',
+          'Mekanik memecah partikel fisik makanan, kimiawi memecah ikatan molekul nutrisi dengan enzim',
+          'Mekanik membutuhkan asam lambung, kimiawi membutuhkan gigi',
+          'Mekanik menghasilkan energi langsung, kimiawi membuang air'
+        ],
+        ans: 1,
+        exp: 'Pencernaan mekanik memperluas permukaan fisik makanan, sehingga enzim pada pencernaan kimiawi dapat memecah makromolekul menjadi monomer siap serap.'
+      },
+      {
+        id: 21, category: 'proses', level: 'Sulit',
+        q: 'Struktur lipatan-lipatan mikroskopis pada dinding dalam usus halus yang mempercepat penyerapan sari makanan disebut...',
+        opts: ['Silia dan flagela', 'Vili dan mikrovili', 'Alveolus dan bronkiolus', 'Nefron dan glomerulus'],
+        ans: 1,
+        exp: 'Vili (jonjot usus) dan mikrovili memperluas permukaan dinding usus halus berkali-kali lipat sehingga penyerapan nutrisi berlangsung sangat efisien.'
+      },
+
+      // --- 4. GANGGUAN & PENYAKIT PENCERNAAN (7 Soal) ---
+      {
+        id: 22, category: 'gangguan', level: 'Mudah',
+        q: 'Gangguan pencernaan yang ditandai dengan frekuensi buang air besar encer lebih dari 3 kali sehari disebut...',
+        opts: ['Sembelit (konstipasi)', 'Diare', 'Maag (gastritis)', 'Usus buntu'],
+        ans: 1,
+        exp: 'Diare terjadi akibat infeksi bakteri/virus atau makanan tercemar sehingga penyerapan air di usus besar terganggu dan feses menjadi encer.'
+      },
+      {
+        id: 23, category: 'gangguan', level: 'Mudah',
+        q: 'Kebiasaan kurang makan sayur dan buah berserat serta kurang minum air putih dapat menyebabkan...',
+        opts: ['Diare', 'Sembelit (konstipasi)', 'Gondongan', 'Tifus'],
+        ans: 1,
+        exp: 'Kurangnya serat dan air menyebabkan sisa makanan bergerak lambat di usus besar dan feses menjadi keras sehingga sulit dikeluarkan (sembelit).'
+      },
+      {
+        id: 24, category: 'gangguan', level: 'Sedang',
+        q: 'Peradangan pada dinding lambung yang sering dipicu pola makan tidak teratur dan meningkatnya asam lambung adalah...',
+        opts: ['Apendisitis', 'Gastritis (maag)', 'Hepatitis', 'Parotitis'],
+        ans: 1,
+        exp: 'Gastritis atau maag adalah iritasi/peradangan mukosa lambung akibat produksi asam lambung berlebih, telat makan, atau infeksi bakteri Helicobacter pylori.'
+      },
+      {
+        id: 25, category: 'gangguan', level: 'Sedang',
+        q: 'Pertolongan pertama yang paling tepat untuk mencegah dehidrasi pada penderita diare adalah...',
+        opts: [
+          'Memberikan larutan oralit atau banyak minum air',
+          'Menghentikan minum air sama sekali',
+          'Memberikan makanan sangat pedas',
+          'Minum obat penambah asam lambung'
+        ],
+        ans: 0,
+        exp: 'Larutan oralit menggantikan cairan dan elektrolit tubuh yang hilang dengan cepat akibat buang air besar berulang.'
+      },
+      {
+        id: 26, category: 'gangguan', level: 'Sedang',
+        q: 'Peradangan yang terjadi pada umbai cacing akibat penyumbatan sisa makanan atau infeksi disebut...',
+        opts: ['Apendisitis (radang usus buntu)', 'Gastritis', 'Disentri', 'Xerostomia'],
+        ans: 0,
+        exp: 'Apendisitis adalah peradangan pada apendiks (umbai cacing) yang biasanya menimbulkan nyeri di perut kanan bawah.'
+      },
+      {
+        id: 27, category: 'gangguan', level: 'Sulit',
+        q: 'Gangguan pada rongga mulut berupa menurunnya produksi air ludah sehingga mulut terasa kering dan pencernaan karbohidrat terganggu disebut...',
+        opts: ['Xerostomia', 'Parotitis', 'Peritonitis', 'Tukak lambung'],
+        ans: 0,
+        exp: 'Xerostomia adalah kondisi produksi saliva sangat rendah sehingga mulut kering dan aktivitas enzim ptialin menurun.'
+      },
+      {
+        id: 28, category: 'gangguan', level: 'Sulit',
+        q: 'Penyakit tifus (demam tifoid) menyerang usus halus dan disebabkan oleh infeksi bakteri...',
+        opts: ['Salmonella enterica serovar Typhi', 'Lactobacillus bulgaricus', 'Streptococcus thermophilus', 'Escherichia coli non-patogen'],
+        ans: 0,
+        exp: 'Demam tifoid disebabkan oleh bakteri Salmonella typhi yang menular melalui makanan atau minuman yang kurang higienis.'
+      },
+
+      // --- 5. NUTRISI & GIZI SEIMBANG (8 Soal) ---
+      {
+        id: 29, category: 'nutrisi', level: 'Mudah',
+        q: 'Zat gizi utama yang berfungsi sebagai sumber energi pokok bagi tubuh manusia adalah...',
+        opts: ['Vitamin', 'Karbohidrat', 'Mineral', 'Air'],
+        ans: 1,
+        exp: 'Karbohidrat (seperti nasi, roti, jagung, kentang, dan singkong) dipecah menjadi glukosa sebagai penghasil energi utama.'
+      },
+      {
+        id: 30, category: 'nutrisi', level: 'Mudah',
+        q: 'Zat gizi yang berperan penting untuk pertumbuhan, perbaikan sel rusak, dan pembentukan antibodi adalah...',
+        opts: ['Protein', 'Serat kasar', 'Lemak jenuh', 'Zat pewarna'],
+        ans: 0,
+        exp: 'Protein berperan sebagai zat pembangun jaringan tubuh dan regenerasi sel, ditemukan pada telur, ikan, daging, tahu, tempe, dan kacang-kacangan.'
+      },
+      {
+        id: 31, category: 'nutrisi', level: 'Sedang',
+        q: 'Vitamin yang larut dalam lemak sehingga membutuhkan lemak makanan agar dapat diserap optimal adalah...',
+        opts: ['Vitamin B dan C', 'Vitamin A, D, E, dan K', 'Vitamin B1 dan B12', 'Vitamin C saja'],
+        ans: 1,
+        exp: 'Vitamin A, D, E, dan K tergolong vitamin larut lemak, sedangkan vitamin B kompleks dan vitamin C larut dalam air.'
+      },
+      {
+        id: 32, category: 'nutrisi', level: 'Sedang',
+        q: 'Kekurangan vitamin C dalam pola makan sehari-hari dapat menyebabkan gangguan berupa...',
+        opts: ['Rabun senja', 'Gusi berdarah (skorbut) dan sariawan', 'Tulang rapuh (rakitis)', 'Anemia berat'],
+        ans: 1,
+        exp: 'Vitamin C menjaga daya tahan tubuh dan kesehatan jaringan ikat/pembuluh darah; kekurangannya memicu skorbut dan gusi mudah berdarah.'
+      },
+      {
+        id: 33, category: 'nutrisi', level: 'Sedang',
+        q: 'Mineral yang sangat dibutuhkan untuk pembentukan hemoglobin dalam sel darah merah guna mencegah anemia adalah...',
+        opts: ['Kalsium', 'Zat besi (Fe)', 'Yodium', 'Natrium'],
+        ans: 1,
+        exp: 'Zat besi merupakan komponen inti hemoglobin yang mengikat oksigen dalam darah, banyak terdapat pada bayam, hati, dan daging merah.'
+      },
+      {
+        id: 34, category: 'nutrisi', level: 'Sulit',
+        q: 'Reagen Biuret yang diteteskan pada bahan makanan berubah warna menjadi ungu. Hal ini membuktikan bahan makanan tersebut mengandung...',
+        opts: ['Glukosa', 'Amilum', 'Protein', 'Lemak'],
+        ans: 2,
+        exp: 'Uji Biuret menghasilkan warna ungu bila bereaksi dengan ikatan peptida pada protein. Lugol untuk amilum (biru kehitaman) dan Benedict untuk glukosa (merah bata).'
+      },
+      {
+        id: 35, category: 'nutrisi', level: 'Sulit',
+        q: 'Bahan makanan diuji dengan larutan Lugol/Iodin dan berubah menjadi warna biru tua kehitaman. Kandungan gizi pada makanan tersebut adalah...',
+        opts: ['Protein', 'Lemak', 'Amilum (pati)', 'Vitamin C'],
+        ans: 2,
+        exp: 'Larutan Lugol bereaksi dengan molekul amilum menghasilkan kompleks berwarna biru tua kehitaman.'
+      },
+      {
+        id: 36, category: 'nutrisi', level: 'Sulit',
+        q: 'Dalam panduan gizi seimbang "Isi Piringku", porsi makanan pokok dan lauk-pauk idealnya mencakup...',
+        opts: [
+          '1/2 bagian piring (1/3 makanan pokok + 1/6 lauk-pauk)',
+          'Seluruh bagian piring tanpa sayur',
+          '1/4 bagian piring saja',
+          '3/4 bagian piring khusus lauk hewani'
+        ],
+        ans: 0,
+        exp: 'Panduan Isi Piringku membagi piring menjadi 2 bagian besar: setengah untuk sayur dan buah, serta setengahnya lagi untuk makanan pokok (2/3) dan lauk-pauk (1/3).'
+      }
+    ];
+
+    /* =====================================================================
+       3. APPLICATION STATE
+       ===================================================================== */
+    const state = {
+      mode: 'individu', // 'individu' | 'kelompok'
+      participants: [
+        { id: 1, name: 'Pemain 1', score: 0, correct: 0, answered: 0, streak: 0, doubleNext: false, catHits: {} },
+        { id: 2, name: 'Pemain 2', score: 0, correct: 0, answered: 0, streak: 0, doubleNext: false, catHits: {} }
+      ],
+      difficulty: 'semua', // 'semua' | 'Mudah' | 'Sedang' | 'Sulit'
+      rounds: 3, // 0 = unlimited
+      timer: 30, // 0 = no timer
+      currentPlayerIndex: 0,
+      currentRound: 1,
+      turnsTakenInRound: 0,
+      isSpinning: false,
+      wheelAngle: 0,
+      usedQuestionIds: new Set(),
+      activeQuestion: null,
+      activeCategory: null,
+      questionTimerId: null,
+      timeLeft: 0,
+      questionStartTimestamp: 0,
+      confettiActive: false
+    };
+
+    /* =====================================================================
+       4. INITIALIZATION & SETUP HANDLERS
+       ===================================================================== */
+    function initApp() {
+      renderCategoryPreview();
+      renderParticipantInputs();
+      drawWheel();
+    }
+
+    function toggleSound() {
+      sfx.muted = !sfx.muted;
+      document.getElementById('soundIcon').textContent = sfx.muted ? '🔇' : '🔊';
+      document.getElementById('soundText').textContent = sfx.muted ? 'Suara Mati' : 'Suara Aktif';
+      if (!sfx.muted) sfx.tick();
+    }
+
+    function toggleGuide() {
+      const content = document.getElementById('guideContent');
+      const btn = document.getElementById('btnToggleGuide');
+      const isHidden = content.classList.toggle('hidden');
+      btn.textContent = isHidden ? 'Tampilkan Panduan' : 'Sembunyikan Panduan';
+      btn.setAttribute('aria-expanded', String(!isHidden));
+    }
+
+    function renderCategoryPreview() {
+      const container = document.getElementById('categoryPreviewList');
+      container.innerHTML = WHEEL_CATEGORIES.map(cat => `
+        <div class="cat-chip" style="background:${cat.color};">
+          <span>${cat.icon}</span>
+          <span>${cat.label}</span>
+        </div>
+      `).join('');
+    }
+
+    function setGameMode(mode) {
+      state.mode = mode;
+      document.getElementById('modeIndividuBtn').classList.toggle('active', mode === 'individu');
+      document.getElementById('modeKelompokBtn').classList.toggle('active', mode === 'kelompok');
+
+      const minCount = mode === 'kelompok' ? 2 : 1;
+      while (state.participants.length < minCount) {
+        state.participants.push(createParticipantObj(state.participants.length + 1));
+      }
+
+      // Rename default names if they haven't been customized
+      state.participants.forEach((p, idx) => {
+        if (/^(Pemain|Kelompok)\s+\d+$/.test(p.name)) {
+          p.name = mode === 'kelompok' ? `Kelompok ${idx + 1}` : `Pemain ${idx + 1}`;
+        }
+      });
+
+      renderParticipantInputs();
+    }
+
+    function createParticipantObj(num) {
+      const prefix = state.mode === 'kelompok' ? 'Kelompok' : 'Pemain';
+      return {
+        id: Date.now() + Math.random(),
+        name: `${prefix} ${num}`,
+        score: 0,
+        correct: 0,
+        answered: 0,
+        streak: 0,
+        doubleNext: false,
+        catHits: {}
+      };
+    }
+
+    function renderParticipantInputs() {
+      const list = document.getElementById('participantList');
+      const label = document.getElementById('participantCountLabel');
+      const addBtn = document.getElementById('btnAddParticipant');
+      const entityName = state.mode === 'kelompok' ? 'Kelompok' : 'Pemain';
+      const minCount = state.mode === 'kelompok' ? 2 : 1;
+
+      label.textContent = `Daftar ${entityName} (${state.participants.length} / 6):`;
+      addBtn.disabled = state.participants.length >= 6;
+
+      list.innerHTML = state.participants.map((p, idx) => `
+        <div class="participant-item">
+          <span class="participant-badge" style="background:${AVATAR_COLORS[idx % AVATAR_COLORS.length]}">
+            ${idx + 1}
+          </span>
+          <input
+            type="text"
+            class="participant-input"
+            maxlength="24"
+            value="${escapeHtml(p.name)}"
+            placeholder="Nama ${entityName} ${idx + 1}"
+            oninput="updateParticipantName(${idx}, this.value)"
+          />
+          ${state.participants.length > minCount ? `
+            <button type="button" class="remove-btn" title="Hapus" onclick="removeParticipant(${idx})">✕</button>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    function updateParticipantName(idx, val) {
+      state.participants[idx].name = val;
+    }
+
+    function addParticipant() {
+      if (state.participants.length >= 6) return;
+      state.participants.push(createParticipantObj(state.participants.length + 1));
+      renderParticipantInputs();
+    }
+
+    function removeParticipant(idx) {
+      const minCount = state.mode === 'kelompok' ? 2 : 1;
+      if (state.participants.length <= minCount) return;
+      state.participants.splice(idx, 1);
+      renderParticipantInputs();
+    }
+
+    function fillExampleNames() {
+      const sampleIndividu = ['Alya Putri', 'Bima Sakti', 'Citra Kirana', 'Dimas Pratama', 'Elena Sari', 'Fajar Nugroho'];
+      const sampleKelompok = ['Tim Lambung Kuat', 'Tim Enzim Cerdas', 'Tim Usus Sehat', 'Tim Nutrisi Prima', 'Tim Peristaltik', 'Tim Vitamin Plus'];
+      const pool = state.mode === 'kelompok' ? sampleKelompok : sampleIndividu;
+
+      if (state.participants.length < 3) {
+        while (state.participants.length < 3) {
+          state.participants.push(createParticipantObj(state.participants.length + 1));
+        }
+      }
+
+      state.participants.forEach((p, idx) => {
+        p.name = pool[idx % pool.length];
+      });
+      renderParticipantInputs();
+      showToast('✨ Contoh nama berhasil diisi!');
+    }
+
+    function selectPill(group, value, btnEl) {
+      state[group] = value;
+      const parent = btnEl.parentElement;
+      parent.querySelectorAll('.pill-choice').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+    }
+
+    /* =====================================================================
+       5. START GAME & GAMEPLAY CONTROLS
+       ===================================================================== */
+    function startGame() {
+      const prefix = state.mode === 'kelompok' ? 'Kelompok' : 'Pemain';
+      state.participants.forEach((p, idx) => {
+        p.name = (p.name || '').trim() || `${prefix} ${idx + 1}`;
+        p.score = 0;
+        p.correct = 0;
+        p.answered = 0;
+        p.streak = 0;
+        p.doubleNext = false;
+        p.catHits = {};
+      });
+
+      state.currentPlayerIndex = 0;
+      state.currentRound = 1;
+      state.turnsTakenInRound = 0;
+      state.isSpinning = false;
+      state.usedQuestionIds.clear();
+
+      document.getElementById('setupScreen').classList.add('hidden');
+      document.getElementById('endScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+      document.getElementById('btnBackSetup').classList.remove('hidden');
+      document.getElementById('btnEndGameNow').classList.remove('hidden');
+
+      sfx.init();
+      updateGameUI();
+      drawWheel();
+    }
+
+    function confirmResetToSetup() {
+      if (state.isSpinning) return;
+      stopQuestionTimer();
+      resetToSetup();
+    }
+
+    function resetToSetup() {
+      stopConfetti();
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('endScreen').classList.add('hidden');
+      document.getElementById('setupScreen').classList.remove('hidden');
+      document.getElementById('btnBackSetup').classList.add('hidden');
+      document.getElementById('btnEndGameNow').classList.add('hidden');
+      renderParticipantInputs();
+    }
+
+    function playAgainSamePlayers() {
+      stopConfetti();
+      startGame();
+    }
+
+    function updateGameUI() {
+      const activeP = state.participants[state.currentPlayerIndex];
+      const color = AVATAR_COLORS[state.currentPlayerIndex % AVATAR_COLORS.length];
+
+      document.getElementById('turnModeLabel').textContent =
+        state.mode === 'kelompok' ? 'GILIRAN KELOMPOK AKTIF' : 'GILIRAN PEMAIN AKTIF';
+      document.getElementById('turnAvatar').textContent = state.currentPlayerIndex + 1;
+      document.getElementById('turnAvatar').style.background = color;
+      document.getElementById('turnPlayerName').textContent = activeP.name;
+
+      document.getElementById('roundIndicator').textContent =
+        state.rounds > 0 ? `Putaran ${state.currentRound} / ${state.rounds}` : `Putaran ${state.currentRound} (Bebas)`;
+      document.getElementById('streakIndicator').textContent = `🔥 Streak: ${activeP.streak}`;
+      document.getElementById('doubleScoreIndicator').classList.toggle('hidden', !activeP.doubleNext);
+
+      const availableCount = getFilteredQuestions().length;
+      document.getElementById('remainingQuestionsBadge').textContent = `Bank Soal Tersedia: ${availableCount}`;
+
+      renderLiveScoreboard();
+    }
+
+    function renderLiveScoreboard() {
+      const list = document.getElementById('scoreboardList');
+      const activeId = state.participants[state.currentPlayerIndex].id;
+
+      // Sort copy by score descending for rank display
+      const sorted = [...state.participants].sort((a, b) => b.score - a.score || b.correct - a.correct);
+
+      list.innerHTML = sorted.map((p, rankIdx) => {
+        const isCurrent = p.id === activeId;
+        const medal = rankIdx === 0 ? '🥇' : rankIdx === 1 ? '🥈' : rankIdx === 2 ? '🥉' : `${rankIdx + 1}`;
+        const rankClass = rankIdx < 3 ? `rank-${rankIdx + 1}` : '';
+
+        return `
+          <div class="score-row ${isCurrent ? 'active-turn' : ''}">
+            <div class="score-left">
+              <div class="rank-medal ${rankClass}">${medal}</div>
+              <div style="min-width:0;">
+                <div class="score-name">
+                  ${escapeHtml(p.name)} ${isCurrent ? '👈' : ''} ${p.doubleNext ? '⚡' : ''}
+                </div>
+                <div class="score-meta">
+                  Benar: ${p.correct}/${p.answered} • Streak: ${p.streak}🔥
+                </div>
+              </div>
+            </div>
+            <div class="score-points">${p.score} pts</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function manualNextTurn() {
+      if (state.isSpinning) return;
+      advanceTurn();
+      showToast(`⏭️ Giliran berpindah ke ${state.participants[state.currentPlayerIndex].name}`);
+    }
+
+    function advanceTurn() {
+      state.turnsTakenInRound += 1;
+
+      if (state.turnsTakenInRound >= state.participants.length) {
+        state.turnsTakenInRound = 0;
+        state.currentRound += 1;
+        state.currentPlayerIndex = 0;
+
+        if (state.rounds > 0 && state.currentRound > state.rounds) {
+          finishGame();
+          return;
+        }
+      } else {
+        state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.participants.length;
+      }
+
+      updateGameUI();
+    }
+
+    /* =====================================================================
+       6. CANVAS 3D-STYLED SPIN WHEEL & PHYSICS
+       ===================================================================== */
+    function drawWheel() {
+      const canvas = document.getElementById('wheelCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const cx = size / 2;
+      const cy = size / 2;
+      const radius = size / 2 - 4;
+      const numSegs = WHEEL_CATEGORIES.length;
+      const arc = (2 * Math.PI) / numSegs;
+
+      ctx.clearRect(0, 0, size, size);
+
+      for (let i = 0; i < numSegs; i++) {
+        const cat = WHEEL_CATEGORIES[i];
+        const startAngle = state.wheelAngle + i * arc;
+        const endAngle = startAngle + arc;
+
+        // Slice fill with radial depth gradient
+        const grad = ctx.createRadialGradient(cx, cy, 30, cx, cy, radius);
+        grad.addColorStop(0, lightenHex(cat.color, 22));
+        grad.addColorStop(0.75, cat.color);
+        grad.addColorStop(1, darkenHex(cat.color, 22));
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Crisp segment border
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        // Decorative outer peg dots
+        const pegAngle = startAngle;
+        const px = cx + Math.cos(pegAngle) * (radius - 14);
+        const py = cy + Math.sin(pegAngle) * (radius - 14);
+        ctx.beginPath();
+        ctx.arc(px, py, 6, 0, 2 * Math.PI);
+        ctx.fillStyle = '#fef08a';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#78350f';
+        ctx.stroke();
+
+        // Segment Icon & Label
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(startAngle + arc / 2);
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+
+        ctx.font = '32px system-ui, sans-serif';
+        ctx.fillText(cat.icon, radius - 30, -14);
+
+        ctx.font = '900 19px system-ui, -apple-system, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0,0,0,0.45)';
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+        ctx.fillText(cat.shortLabel, radius - 28, 16);
+        ctx.restore();
+      }
+    }
+
+    function spinWheel() {
+      if (state.isSpinning) return;
+      state.isSpinning = true;
+
+      document.getElementById('mainSpinBtn').disabled = true;
+      document.getElementById('hubSpinBtn').disabled = true;
+      document.getElementById('manualNextBtn').disabled = true;
+
+      sfx.init();
+
+      const numSegs = WHEEL_CATEGORIES.length;
+      const arc = (2 * Math.PI) / numSegs;
+      const extraSpins = (5 + Math.random() * 3) * 2 * Math.PI;
+      const randomStop = Math.random() * 2 * Math.PI;
+
+      const startAngle = state.wheelAngle;
+      const targetAngle = startAngle + extraSpins + randomStop;
+      const duration = 4000;
+      const startTime = performance.now();
+      let lastSegIdx = -1;
+
+      function animate(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / duration, 1);
+        // Smooth quintic ease-out deceleration
+        const ease = 1 - Math.pow(1 - t, 5);
+        state.wheelAngle = startAngle + (targetAngle - startAngle) * ease;
+
+        drawWheel();
+
+        // Pointer sits at top (-PI/2 = 1.5*PI)
+        const pointerRel = (1.5 * Math.PI - (state.wheelAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+        const segIdx = Math.floor(pointerRel / arc) % numSegs;
+
+        if (segIdx !== lastSegIdx) {
+          lastSegIdx = segIdx;
+          sfx.tick();
+          const ptr = document.getElementById('wheelPointer');
+          ptr.classList.remove('tick');
+          void ptr.offsetWidth;
+          ptr.classList.add('tick');
+        }
+
+        if (t < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          state.isSpinning = false;
+          document.getElementById('mainSpinBtn').disabled = false;
+          document.getElementById('hubSpinBtn').disabled = false;
+          document.getElementById('manualNextBtn').disabled = false;
+
+          const landedCategory = WHEEL_CATEGORIES[segIdx];
+          sfx.landCategory();
+          setTimeout(() => handleWheelResult(landedCategory), 380);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function handleWheelResult(category) {
+      if (category.id === 'bonus') {
+        openBonusModal();
+      } else {
+        openQuestionModal(category);
+      }
+    }
+
+    /* =====================================================================
+       7. BONUS SEGMENT & QUESTION MODAL LOGIC
+       ===================================================================== */
+    function openBonusModal() {
+      const player = state.participants[state.currentPlayerIndex];
+      document.getElementById('bonusPlayerBadge').textContent = player.name;
+
+      const bonusTypes = [
+        {
+          type: 'free_points',
+          emoji: '💰',
+          title: 'BONUS +100 POIN GRATIS!',
+          desc: `Selamat ${player.name}! Roda keberuntungan memberimu +100 poin langsung tanpa harus menjawab soal.`,
+          btnText: 'Klaim +100 Poin & Lanjut ✨'
+        },
+        {
+          type: 'double_next',
+          emoji: '⚡',
+          title: 'KARTU 2x POIN AKTIF!',
+          desc: `${player.name} mendapatkan pengali 2x POIN untuk soal berikutnya! Sekarang pilih kategori tantangan cepat.`,
+          btnText: 'Lanjut ke Tantangan 2x Poin 🚀'
+        },
+        {
+          type: 'quick_challenge',
+          emoji: '🎯',
+          title: 'TANTANGAN EMAS (+50 BONUS)!',
+          desc: `Jawab 1 soal sistem pencernaan pilihan acak dengan hadiah tambahan +50 poin bonus di atas skor soal!`,
+          btnText: 'Buka Tantangan Emas 🔥'
+        }
+      ];
+
+      const chosen = bonusTypes[Math.floor(Math.random() * bonusTypes.length)];
+      document.getElementById('bonusEmoji').textContent = chosen.emoji;
+      document.getElementById('bonusTitle').textContent = chosen.title;
+      document.getElementById('bonusDesc').textContent = chosen.desc;
+
+      const btn = document.getElementById('bonusActionBtn');
+      btn.textContent = chosen.btnText;
+      btn.onclick = () => {
+        document.getElementById('bonusModal').classList.add('hidden');
+        if (chosen.type === 'free_points') {
+          player.score += 100;
+          sfx.bonus();
+          showToast(`🎉 ${player.name} mendapat +100 Poin Gratis!`);
+          advanceTurn();
+        } else if (chosen.type === 'double_next') {
+          player.doubleNext = true;
+          sfx.bonus();
+          const randomCat = WHEEL_CATEGORIES[Math.floor(Math.random() * 5)];
+          openQuestionModal(randomCat, 0);
+        } else {
+          sfx.bonus();
+          const randomCat = WHEEL_CATEGORIES[Math.floor(Math.random() * 5)];
+          openQuestionModal(randomCat, 50);
+        }
+      };
+
+      sfx.bonus();
+      document.getElementById('bonusModal').classList.remove('hidden');
+    }
+
+    function getFilteredQuestions(categoryId = null) {
+      let pool = QUESTION_BANK.filter(q => !state.usedQuestionIds.has(q.id));
+      if (pool.length === 0) {
+        state.usedQuestionIds.clear();
+        pool = [...QUESTION_BANK];
+      }
+
+      if (state.difficulty !== 'semua') {
+        const diffPool = pool.filter(q => q.level === state.difficulty);
+        if (diffPool.length > 0) pool = diffPool;
+      }
+
+      if (categoryId) {
+        const catPool = pool.filter(q => q.category === categoryId);
+        if (catPool.length > 0) return catPool;
+      }
+
+      return pool;
+    }
+
+    function openQuestionModal(category, extraBonus = 0) {
+      const player = state.participants[state.currentPlayerIndex];
+      const candidates = getFilteredQuestions(category.id);
+      const question = candidates[Math.floor(Math.random() * candidates.length)];
+
+      state.usedQuestionIds.add(question.id);
+      state.activeQuestion = { ...question, extraBonus };
+      state.activeCategory = category;
+
+      const header = document.getElementById('qModalHeader');
+      header.style.background = category.color;
+
+      document.getElementById('qModalPlayerTag').textContent =
+        `Giliran: ${player.name}${player.doubleNext ? ' (⚡ 2x Poin)' : ''}${extraBonus ? ` (+${extraBonus} Bonus)` : ''}`;
+      document.getElementById('qModalCategoryTitle').textContent = `${category.icon} ${category.label}`;
+
+      const lvlBadge = document.getElementById('qModalLevelBadge');
+      lvlBadge.textContent = question.level;
+      lvlBadge.className = `level-pill lvl-${question.level.toLowerCase()}`;
+
+      document.getElementById('qModalText').textContent = question.q;
+
+      const letters = ['A', 'B', 'C', 'D'];
+      const optsContainer = document.getElementById('qModalOptions');
+      optsContainer.innerHTML = question.opts.map((optText, idx) => `
+        <button type="button" class="option-btn" onclick="submitAnswer(${idx}, this)">
+          <span class="option-letter">${letters[idx]}</span>
+          <span>${escapeHtml(optText)}</span>
+        </button>
+      `).join('');
+
+      document.getElementById('qModalFeedback').classList.add('hidden');
+      document.getElementById('qModalNextBtn').classList.add('hidden');
+      document.getElementById('qModalHint').textContent = 'Pilih salah satu jawaban A, B, C, atau D';
+
+      state.questionStartTimestamp = performance.now();
+      startQuestionTimer();
+
+      document.getElementById('questionModal').classList.remove('hidden');
+    }
+
+    function startQuestionTimer() {
+      stopQuestionTimer();
+      const timerEl = document.getElementById('qModalTimer');
+      if (state.timer <= 0) {
+        timerEl.classList.add('hidden');
+        return;
+      }
+
+      state.timeLeft = state.timer;
+      timerEl.classList.remove('hidden', 'urgent');
+      timerEl.textContent = `⏱️ ${state.timeLeft}d`;
+
+      state.questionTimerId = setInterval(() => {
+        state.timeLeft -= 1;
+        timerEl.textContent = `⏱️ ${state.timeLeft}d`;
+
+        if (state.timeLeft <= 7 && state.timeLeft > 0) {
+          timerEl.classList.add('urgent');
+          sfx.tick();
+        }
+
+        if (state.timeLeft <= 0) {
+          stopQuestionTimer();
+          handleTimeOut();
+        }
+      }, 1000);
+    }
+
+    function stopQuestionTimer() {
+      if (state.questionTimerId) {
+        clearInterval(state.questionTimerId);
+        state.questionTimerId = null;
+      }
+    }
+
+    function handleTimeOut() {
+      const q = state.activeQuestion;
+      const player = state.participants[state.currentPlayerIndex];
+      player.answered += 1;
+      player.streak = 0;
+      player.doubleNext = false;
+
+      const buttons = document.querySelectorAll('#qModalOptions .option-btn');
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === q.ans) btn.classList.add('correct');
+      });
+
+      sfx.wrong();
+      showQuestionFeedback(false, '⏰ Waktu Habis!', q.exp);
+      updateGameUI();
+    }
+
+    function submitAnswer(selectedIdx, btnEl) {
+      stopQuestionTimer();
+      const q = state.activeQuestion;
+      const player = state.participants[state.currentPlayerIndex];
+      const isCorrect = selectedIdx === q.ans;
+
+      const buttons = document.querySelectorAll('#qModalOptions .option-btn');
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === q.ans) btn.classList.add('correct');
+        else if (idx === selectedIdx && !isCorrect) btn.classList.add('wrong');
+      });
+
+      player.answered += 1;
+
+      if (isCorrect) {
+        player.correct += 1;
+        player.streak += 1;
+        const catName = state.activeCategory.label;
+        player.catHits[catName] = (player.catHits[catName] || 0) + 1;
+
+        const basePoints = q.level === 'Sulit' ? 200 : q.level === 'Sedang' ? 150 : 100;
+        const streakBonus = player.streak > 1 ? (player.streak - 1) * 25 : 0;
+
+        let speedBonus = 0;
+        if (state.timer > 0 && state.timeLeft > 0) {
+          const ratio = state.timeLeft / state.timer;
+          speedBonus = Math.round(ratio * 50);
+        }
+
+        let subtotal = basePoints + streakBonus + speedBonus + (q.extraBonus || 0);
+        const multiplier = player.doubleNext ? 2 : 1;
+        const totalEarned = subtotal * multiplier;
+        player.doubleNext = false;
+
+        player.score += totalEarned;
+        sfx.correct();
+
+        const breakdown = [
+          `Dasar +${basePoints}`,
+          speedBonus > 0 ? `Cepat +${speedBonus}` : '',
+          streakBonus > 0 ? `Streak +${streakBonus}` : '',
+          q.extraBonus > 0 ? `Bonus +${q.extraBonus}` : '',
+          multiplier === 2 ? '2x POIN!' : ''
+        ].filter(Boolean).join(' • ');
+
+        showQuestionFeedback(true, `🎉 Benar! +${totalEarned} Poin (${breakdown})`, q.exp);
+      } else {
+        player.streak = 0;
+        player.doubleNext = false;
+        sfx.wrong();
+        showQuestionFeedback(false, '❌ Jawaban Belum Tepat!', q.exp);
+      }
+
+      updateGameUI();
+    }
+
+    function showQuestionFeedback(isOk, titleText, explanationText) {
+      const card = document.getElementById('qModalFeedback');
+      card.className = `feedback-card ${isOk ? 'ok' : 'no'}`;
+      document.getElementById('qFeedbackTitle').textContent = titleText;
+      document.getElementById('qFeedbackDesc').textContent = explanationText;
+
+      document.getElementById('qModalHint').textContent = 'Simak pembahasan sebelum lanjut ke giliran berikutnya';
+      document.getElementById('qModalNextBtn').classList.remove('hidden');
+    }
+
+    function closeQuestionModalAndAdvance() {
+      document.getElementById('questionModal').classList.add('hidden');
+      advanceTurn();
+    }
+
+    /* =====================================================================
+       8. FINISH GAME, 3D PODIUM & CONFETTI CELEBRATION
+       ===================================================================== */
+    function finishGame() {
+      stopQuestionTimer();
+      document.getElementById('questionModal').classList.add('hidden');
+      document.getElementById('bonusModal').classList.add('hidden');
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('endScreen').classList.remove('hidden');
+      document.getElementById('btnEndGameNow').classList.add('hidden');
+
+      const ranked = [...state.participants].sort((a, b) => b.score - a.score || b.correct - a.correct);
+      renderPodium(ranked);
+      renderFinalStats(ranked);
+
+      sfx.victory();
+      launchConfetti();
+    }
+
+    function renderPodium(ranked) {
+      const stage = document.getElementById('podiumStage');
+      // Visual podium order: 2nd (left), 1st (center), 3rd (right)
+      const order = [];
+      if (ranked[1]) order.push({ player: ranked[1], rank: 2, crown: '🥈', cls: 'podium-2' });
+      if (ranked[0]) order.push({ player: ranked[0], rank: 1, crown: '👑', cls: 'podium-1' });
+      if (ranked[2]) order.push({ player: ranked[2], rank: 3, crown: '🥉', cls: 'podium-3' });
+
+      stage.innerHTML = order.map(item => `
+        <div class="podium-col">
+          <div class="podium-player-tag">
+            <div class="podium-crown">${item.crown}</div>
+            <div class="podium-name">${escapeHtml(item.player.name)}</div>
+            <div class="podium-score">${item.player.score} Poin</div>
+          </div>
+          <div class="podium-block ${item.cls}">${item.rank}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderFinalStats(ranked) {
+      const list = document.getElementById('finalStatsList');
+      list.innerHTML = ranked.map((p, idx) => {
+        const acc = p.answered > 0 ? Math.round((p.correct / p.answered) * 100) : 0;
+        const bestCat = getBestCategory(p.catHits);
+        const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+
+        return `
+          <div class="score-row ${idx === 0 ? 'active-turn' : ''}">
+            <div class="score-left">
+              <div class="rank-medal ${idx < 3 ? `rank-${idx + 1}` : ''}">${medal}</div>
+              <div>
+                <div class="score-name">${escapeHtml(p.name)}</div>
+                <div class="score-meta">
+                  Akurasi: ${acc}% (${p.correct}/${p.answered} soal) • Kategori Unggulan: ${bestCat}
+                </div>
+              </div>
+            </div>
+            <div class="score-points">${p.score} pts</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getBestCategory(catHits) {
+      const entries = Object.entries(catHits || {});
+      if (entries.length === 0) return 'Semua Kategori';
+      entries.sort((a, b) => b[1] - a[1]);
+      return entries[0][0];
+    }
+
+    /* =====================================================================
+       9. CONFETTI PARTICLE SYSTEM & UTILITIES
+       ===================================================================== */
+    function launchConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      state.confettiActive = true;
+
+      const colors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'];
+      const particles = Array.from({ length: 130 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: 8 + Math.random() * 8,
+        h: 5 + Math.random() * 6,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vy: 2.2 + Math.random() * 3.5,
+        vx: -1.6 + Math.random() * 3.2,
+        rot: Math.random() * 360,
+        vRot: -5 + Math.random() * 10
+      }));
+
+      function step() {
+        if (!state.confettiActive) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          return;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vRot;
+          if (p.y > canvas.height) {
+            p.y = -15;
+            p.x = Math.random() * canvas.width;
+          }
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rot * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        }
+        requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    function stopConfetti() {
+      state.confettiActive = false;
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toast._tid);
+      toast._tid = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function lightenHex(hex, amt) {
+      const num = parseInt(hex.slice(1), 16);
+      const r = Math.min(255, (num >> 16) + amt);
+      const g = Math.min(255, ((num >> 8) & 0xff) + amt);
+      const b = Math.min(255, (num & 0xff) + amt);
+      return `rgb(${r},${g},${b})`;
+    }
+
+    function darkenHex(hex, amt) {
+      const num = parseInt(hex.slice(1), 16);
+      const r = Math.max(0, (num >> 16) - amt);
+      const g = Math.max(0, ((num >> 8) & 0xff) - amt);
+      const b = Math.max(0, (num & 0xff) - amt);
+      return `rgb(${r},${g},${b})`;
+    }
+
+    // Spacebar shortcut to spin wheel on active game screen
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        const gameVisible = !document.getElementById('gameScreen').classList.contains('hidden');
+        const qHidden = document.getElementById('questionModal').classList.contains('hidden');
+        const bHidden = document.getElementById('bonusModal').classList.contains('hidden');
+        if (gameVisible && qHidden && bHidden && !state.isSpinning) {
+          e.preventDefault();
+          spinWheel();
+        }
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (state.confettiActive) {
+        const canvas = document.getElementById('confettiCanvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+    });
+
+    window.onload = initApp;
+  </script>
+</body>
+</html>

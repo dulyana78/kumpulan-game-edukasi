@@ -1,0 +1,2701 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Super Mario Edukasi – Petualangan Tujuan Pembelajaran</title>
+  <style>
+    :root {
+      --sky-top: #5c94fc;
+      --sky-bottom: #93c5fd;
+      --panel-bg: #fffdf7;
+      --panel-border: #1e293b;
+      --accent-red: #e52521;
+      --accent-yellow: #fbd000;
+      --accent-green: #43b047;
+      --accent-blue: #049cd8;
+      --ink: #0f172a;
+      --muted: #475569;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-retro: 0 6px 0 #0f172a, 0 12px 24px rgba(15, 23, 42, 0.22);
+      --font-retro: "Courier New", Courier, monospace;
+      --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-ui);
+      color: var(--ink);
+      background: linear-gradient(180deg, #3b82f6 0%, #bae6fd 58%, #86efac 58%, #4ade80 100%);
+      overflow-x: hidden;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Top Retro Header */
+    .topbar {
+      background: #0f172a;
+      color: #ffffff;
+      border-bottom: 4px solid var(--accent-yellow);
+      padding: 10px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .topbar-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      background: var(--accent-red);
+      color: #fff;
+      font-family: var(--font-retro);
+      font-weight: 900;
+      font-size: 0.9rem;
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 2px solid #fff;
+      box-shadow: 0 3px 0 #7f1d1d;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-family: var(--font-retro);
+      font-size: clamp(0.95rem, 2vw, 1.3rem);
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      color: var(--accent-yellow);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Retro 3D Buttons */
+    .btn {
+      border: 2.5px solid #0f172a;
+      border-radius: 12px;
+      padding: 9px 14px;
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      position: relative;
+      top: 0;
+      transition: transform 0.08s ease, filter 0.12s ease;
+      user-select: none;
+    }
+
+    .btn:hover:not(:disabled) {
+      filter: brightness(1.05);
+    }
+
+    .btn:active:not(:disabled) {
+      top: 3px;
+      box-shadow: 0 1px 0 #0f172a !important;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-red {
+      background: var(--accent-red);
+      color: #fff;
+      box-shadow: 0 4px 0 #0f172a;
+    }
+
+    .btn-yellow {
+      background: var(--accent-yellow);
+      color: #0f172a;
+      box-shadow: 0 4px 0 #0f172a;
+    }
+
+    .btn-green {
+      background: var(--accent-green);
+      color: #fff;
+      box-shadow: 0 4px 0 #0f172a;
+    }
+
+    .btn-blue {
+      background: var(--accent-blue);
+      color: #fff;
+      box-shadow: 0 4px 0 #0f172a;
+    }
+
+    .btn-light {
+      background: #f8fafc;
+      color: #0f172a;
+      box-shadow: 0 4px 0 #0f172a;
+    }
+
+    .btn-lg {
+      padding: 13px 22px;
+      font-size: 1.05rem;
+      border-radius: 14px;
+    }
+
+    /* Page Container */
+    .page-wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Setup Panel */
+    .setup-card {
+      background: var(--panel-bg);
+      border: 3.5px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-retro);
+      padding: 20px;
+    }
+
+    .setup-heading {
+      margin: 0 0 14px;
+      font-family: var(--font-retro);
+      font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+      font-weight: 900;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 820px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-label {
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: #0f172a;
+    }
+
+    .input-retro,
+    .textarea-retro,
+    .select-retro {
+      width: 100%;
+      border: 2.5px solid #0f172a;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: #ffffff;
+      color: #0f172a;
+      outline: none;
+    }
+
+    .input-retro:focus,
+    .textarea-retro:focus,
+    .select-retro:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(4, 156, 216, 0.25);
+    }
+
+    .textarea-retro {
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    .auto-gen-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: #eff6ff;
+      border: 2.5px solid #0f172a;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+
+    .auto-gen-status {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+
+    /* Tabs for Question Bank & Manual Editor */
+    .tabs-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      border-bottom: 3px solid #0f172a;
+      padding-bottom: 10px;
+    }
+
+    .tab-btn {
+      border: 2.5px solid #0f172a;
+      background: #e2e8f0;
+      color: #0f172a;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-yellow);
+      box-shadow: 0 3px 0 #0f172a;
+    }
+
+    .question-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 460px;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-bottom: 16px;
+    }
+
+    .q-editor-card {
+      background: #f8fafc;
+      border: 2.5px solid #0f172a;
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .q-editor-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .q-badge {
+      background: var(--accent-blue);
+      color: #fff;
+      font-family: var(--font-retro);
+      font-size: 0.82rem;
+      font-weight: 900;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 2px solid #0f172a;
+    }
+
+    .opts-3-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    @media (max-width: 700px) {
+      .opts-3-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .q-meta-row {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .q-meta-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .setup-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 2.5px dashed #94a3b8;
+    }
+
+    /* Gameplay HUD & Mission Banner */
+    .hud-bar {
+      background: #0f172a;
+      color: #fff;
+      border: 3px solid #0f172a;
+      border-bottom: none;
+      border-radius: 16px 16px 0 0;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-family: var(--font-retro);
+    }
+
+    .hud-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: clamp(0.85rem, 1.5vw, 1.05rem);
+      font-weight: 900;
+    }
+
+    .hud-val-yellow { color: var(--accent-yellow); }
+    .hud-val-green { color: #4ade80; }
+    .hud-val-red { color: #f87171; }
+
+    .mission-banner {
+      background: #fef08a;
+      border-left: 4px solid #0f172a;
+      border-right: 4px solid #0f172a;
+      border-bottom: 3px solid #0f172a;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .mission-banner-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+      .mission-banner-text {
+        white-space: normal;
+      }
+    }
+
+    /* Canvas Stage */
+    .canvas-frame {
+      position: relative;
+      background: #5c94fc;
+      border: 4px solid #0f172a;
+      border-top: none;
+      border-radius: 0 0 18px 18px;
+      box-shadow: var(--shadow-retro);
+      overflow: hidden;
+    }
+
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      background: #5c94fc;
+    }
+
+    /* Floating Mission Toast on Canvas */
+    .level-mission-toast {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.92);
+      color: #fff;
+      border: 3px solid var(--accent-yellow);
+      border-radius: 14px;
+      padding: 10px 18px;
+      max-width: 90%;
+      text-align: center;
+      font-weight: 800;
+      font-size: clamp(0.85rem, 1.5vw, 1.05rem);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+      z-index: 15;
+      pointer-events: none;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .level-mission-toast.fade-out {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-10px);
+    }
+
+    /* Touch & Desktop Control Bar */
+    .controls-footer {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .touch-pad {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .touch-btn {
+      width: 62px;
+      height: 62px;
+      border-radius: 16px;
+      border: 3px solid #0f172a;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: var(--font-retro);
+      font-size: 1.4rem;
+      font-weight: 900;
+      box-shadow: 0 5px 0 #0f172a;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .touch-btn:active,
+    .touch-btn.pressed {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #0f172a;
+      background: #fef08a;
+    }
+
+    .touch-jump {
+      width: 84px;
+      background: var(--accent-red);
+      color: #fff;
+    }
+
+    .key-hint-box {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2.5px solid #0f172a;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* Retro Quiz Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      z-index: 100;
+    }
+
+    .quiz-modal-box {
+      background: #fffdf7;
+      border: 4px solid #0f172a;
+      border-radius: 20px;
+      box-shadow: 0 10px 0 #0f172a, 0 24px 48px rgba(0, 0, 0, 0.45);
+      width: 100%;
+      max-width: 660px;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 20px;
+      animation: popModal 0.2s ease-out;
+    }
+
+    @keyframes popModal {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .quiz-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .quiz-block-tag {
+      background: var(--accent-yellow);
+      color: #0f172a;
+      border: 2.5px solid #0f172a;
+      border-radius: 10px;
+      padding: 4px 10px;
+      font-family: var(--font-retro);
+      font-weight: 900;
+      font-size: 0.85rem;
+    }
+
+    .quiz-question-text {
+      margin: 10px 0 16px;
+      font-size: clamp(1.05rem, 2vw, 1.28rem);
+      font-weight: 800;
+      line-height: 1.45;
+      color: #0f172a;
+      background: #f1f5f9;
+      border: 2.5px solid #0f172a;
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .quiz-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .choice-btn {
+      width: 100%;
+      border: 3px solid #0f172a;
+      border-radius: 14px;
+      background: #ffffff;
+      color: #0f172a;
+      padding: 12px 14px;
+      text-align: left;
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 0 #0f172a;
+      transition: transform 0.08s ease, background 0.12s ease;
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      background: #eff6ff;
+      transform: translateX(3px);
+    }
+
+    .choice-btn:disabled {
+      cursor: default;
+    }
+
+    .choice-key {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: 2px solid #0f172a;
+      background: var(--accent-yellow);
+      color: #0f172a;
+      font-family: var(--font-retro);
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .choice-btn.is-correct {
+      background: #22c55e;
+      color: #ffffff;
+    }
+
+    .choice-btn.is-correct .choice-key {
+      background: #ffffff;
+      color: #15803d;
+    }
+
+    .choice-btn.is-wrong {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .choice-btn.is-wrong .choice-key {
+      background: #ffffff;
+      color: #b91c1c;
+    }
+
+    .feedback-box {
+      margin-top: 14px;
+      border: 3px solid #0f172a;
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    .feedback-ok {
+      background: #dcfce7;
+      color: #14532d;
+    }
+
+    .feedback-err {
+      background: #fee2e2;
+      color: #7f1d1d;
+    }
+
+    .feedback-heading {
+      margin: 0 0 4px;
+      font-family: var(--font-retro);
+      font-weight: 900;
+      font-size: 1.05rem;
+    }
+
+    .feedback-body {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    /* Certificate / Victory & Game Over Screen */
+    .certificate-card {
+      background: #fffdf7;
+      border: 4px solid #0f172a;
+      border-top: 10px solid var(--accent-yellow);
+      border-radius: 22px;
+      box-shadow: var(--shadow-retro);
+      padding: 24px;
+      max-width: 780px;
+      margin: 12px auto;
+    }
+
+    .cert-header {
+      text-align: center;
+      border-bottom: 3px dashed #0f172a;
+      padding-bottom: 16px;
+      margin-bottom: 18px;
+    }
+
+    .cert-ribbon {
+      display: inline-block;
+      background: var(--accent-red);
+      color: #fff;
+      border: 2.5px solid #0f172a;
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-family: var(--font-retro);
+      font-weight: 900;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    .cert-title {
+      margin: 4px 0;
+      font-family: var(--font-retro);
+      font-size: clamp(1.35rem, 2.8vw, 2rem);
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    .cert-goal-box {
+      background: #fef9c3;
+      border: 2.5px solid #0f172a;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-tile {
+      background: #f8fafc;
+      border: 2.5px solid #0f172a;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .stat-num {
+      font-family: var(--font-retro);
+      font-size: 1.55rem;
+      font-weight: 900;
+      color: #0f172a;
+      margin-top: 2px;
+    }
+
+    /* Toast */
+    .toast-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #0f172a;
+      color: #fff;
+      border: 2.5px solid var(--accent-yellow);
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: all 0.25s ease;
+      z-index: 200;
+    }
+
+    .toast-bar.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div id="toastBar" class="toast-bar" role="status" aria-live="polite"></div>
+
+  <!-- Top Header -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-badge">1-1 EDU</span>
+        <h1 class="brand-title">SUPER MARIO EDUKASI • TUJUAN PEMBELAJARAN</h1>
+      </div>
+
+      <div class="topbar-actions">
+        <button type="button" class="btn btn-yellow" id="btnMute" onclick="toggleMute()">
+          <span id="muteIcon">🔊</span> <span id="muteLabel">Suara 8-Bit: ON</span>
+        </button>
+        <button type="button" class="btn btn-light hidden" id="btnTopSetup" onclick="goToSetup()">
+          📝 Ubah Tujuan / Soal
+        </button>
+        <button type="button" class="btn btn-blue hidden" id="btnTopRestart" onclick="startLevel()">
+          🔄 Ulang Level
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+    <!-- =================================================================
+         SCREEN 1: TEACHER SETUP & LEARNING OBJECTIVE INPUT
+         ================================================================= -->
+    <section id="setupScreen" class="setup-card">
+      <h2 class="setup-heading">🎯 Pengaturan Guru &amp; Tujuan Pembelajaran</h2>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label for="subjectTitleInput" class="field-label">a. Judul Materi / Mata Pelajaran</label>
+          <input
+            type="text"
+            id="subjectTitleInput"
+            class="input-retro"
+            value="IPA Kelas 5 - Ekosistem & Rantai Makanan"
+            placeholder="Contoh: IPA Kelas 5 - Ekosistem & Rantai Makanan"
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="learningGoalInput" class="field-label">b. Tujuan Pembelajaran</label>
+          <textarea
+            id="learningGoalInput"
+            class="textarea-retro"
+            placeholder="Tuliskan tujuan pembelajaran yang ingin dicapai siswa..."
+          >Siswa mampu memahami konsep dasar ekosistem dan rantai makanan</textarea>
+        </div>
+      </div>
+
+      <!-- Auto Question Generator Bar -->
+      <div class="auto-gen-bar">
+        <div class="auto-gen-status" id="autoGenStatus">
+          💡 Generator cerdas mendeteksi topik dari Tujuan Pembelajaran dan membuat 5 soal pilihan ganda (A, B, C) + pembahasan.
+        </div>
+        <button type="button" class="btn btn-blue" onclick="generateQuestionsFromGoal()">
+          ✨ Buat Soal Otomatis dari Tujuan Pembelajaran
+        </button>
+      </div>
+
+      <!-- Tabs: Preview / Edit Manual -->
+      <div class="tabs-bar" role="tablist">
+        <button type="button" class="tab-btn active" id="tabListBtn" onclick="switchEditorTab('list')">
+          📋 Daftar Soal Aktif (<span id="activeQCount">5</span>)
+        </button>
+        <button type="button" class="tab-btn" id="tabManualBtn" onclick="switchEditorTab('manual')">
+          ✏️ Edit Soal Manual &amp; Tambah Soal
+        </button>
+      </div>
+
+      <!-- Tab 1: Active Questions Overview -->
+      <div id="tabListPanel">
+        <div class="question-cards-list" id="questionPreviewList"></div>
+      </div>
+
+      <!-- Tab 2: Full Manual Question Editor -->
+      <div id="tabManualPanel" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+          <span style="font-size:0.88rem; font-weight:700; color:#334155;">
+            Ubah teks soal, pilihan A/B/C, kunci jawaban, dan pembahasan singkat, atau tambah soal baru.
+          </span>
+          <button type="button" class="btn btn-yellow" onclick="addManualQuestion()">
+            ➕ Tambah Pertanyaan Baru
+          </button>
+        </div>
+        <div class="question-cards-list" id="questionEditorList"></div>
+      </div>
+
+      <div class="setup-footer">
+        <span style="font-size:0.86rem; font-weight:700; color:#475569;">
+          Minimal 1 soal (disarankan 5 soal untuk 5 blok tanda tanya [?] di level).
+        </span>
+        <button type="button" class="btn btn-green btn-lg" onclick="saveAndStartGame()">
+          🚀 Simpan &amp; Mulai Game
+        </button>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         SCREEN 2: RETRO 2D PLATFORMER GAMEPLAY
+         ================================================================= -->
+    <section id="gameScreen" class="hidden">
+      <div class="hud-bar">
+        <div class="hud-group">
+          <span id="hudSubject" class="hud-val-yellow">IPA KELAS 5</span>
+          <span>SKOR: <strong id="hudScore" class="hud-val-yellow">000000</strong></span>
+          <span>KOIN: <strong id="hudCoins" class="hud-val-yellow">x00</strong></span>
+          <span>NYAWA: <strong id="hudLives" class="hud-val-red">♥♥♥</strong></span>
+          <span>KUIS: <strong id="hudQuizProg" class="hud-val-green">0/5</strong></span>
+        </div>
+        <div id="hudPowerBadge" class="hud-val-green" style="font-size:0.85rem;">STATUS: NORMAL</div>
+      </div>
+
+      <div class="mission-banner">
+        <div class="mission-banner-text" id="persistentMissionText">
+          🎯 Misi Belajar: Siswa mampu memahami konsep dasar ekosistem dan rantai makanan
+        </div>
+        <button type="button" class="btn btn-yellow" style="padding:5px 10px; font-size:0.78rem; flex-shrink:0;" onclick="showMissionPopup()">
+          🎯 Lihat Misi
+        </button>
+      </div>
+
+      <div class="canvas-frame">
+        <div id="levelMissionToast" class="level-mission-toast hidden"></div>
+        <canvas id="gameCanvas" width="960" height="540"></canvas>
+      </div>
+
+      <div class="controls-footer">
+        <!-- Virtual Touch Controls -->
+        <div class="touch-pad" aria-label="Kontrol sentuh">
+          <button type="button" class="touch-btn" id="touchLeft" aria-label="Gerak Kiri">◀</button>
+          <button type="button" class="touch-btn" id="touchRight" aria-label="Gerak Kanan">▶</button>
+          <button type="button" class="touch-btn touch-jump" id="touchJump" aria-label="Lompat">LOMPAT</button>
+        </div>
+
+        <div class="key-hint-box">
+          ⌨️ <strong>Panah Kiri/Kanan</strong> atau <strong>A/D</strong>: Jalan • <strong>Spasi / W / Panah Atas</strong>: Lompat • Sundul blok <strong>[?]</strong> dari bawah &amp; injak musuh dari atas!
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         SCREEN 3: CERTIFICATE / VICTORY & GAME OVER SUMMARY
+         ================================================================= -->
+    <section id="resultScreen" class="hidden">
+      <div class="certificate-card">
+        <div class="cert-header">
+          <div class="cert-ribbon" id="resultBadge">SERTIFIKAT PENYELESAIAN MISI</div>
+          <h2 class="cert-title" id="resultTitle">SELAMAT! MISI BELAJAR TUNTAS</h2>
+          <p style="margin:4px 0 0; font-weight:700; color:#475569;" id="resultSubjectLine">
+            Materi: IPA Kelas 5 - Ekosistem &amp; Rantai Makanan
+          </p>
+        </div>
+
+        <div class="cert-goal-box">
+          <div style="font-size:0.8rem; font-weight:900; text-transform:uppercase; color:#854d0e; margin-bottom:4px;">
+            🎯 Tujuan Pembelajaran yang Ditempuh:
+          </div>
+          <div style="font-size:1.05rem; font-weight:800; color:#0f172a;" id="resultGoalText">
+            Siswa mampu memahami konsep dasar ekosistem dan rantai makanan
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-tile">
+            <div class="stat-label">Total Skor</div>
+            <div class="stat-num" id="statScore">0</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-label">Akurasi Kuis</div>
+            <div class="stat-num" id="statAccuracy">0%</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-label">Kuis Benar</div>
+            <div class="stat-num" id="statCorrect">0/0</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-label">Koin Terkumpul</div>
+            <div class="stat-num" id="statCoins">0</div>
+          </div>
+        </div>
+
+        <p id="resultMessage" style="text-align:center; font-weight:700; color:#334155; margin:0 0 20px;"></p>
+
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px;">
+          <button type="button" class="btn btn-green btn-lg" onclick="startLevel()">
+            🔄 Main Lagi
+          </button>
+          <button type="button" class="btn btn-yellow btn-lg" onclick="goToSetup()">
+            ✏️ Ubah Tujuan / Soal
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =================================================================
+       RETRO QUIZ POP-UP MODAL
+       ================================================================= -->
+  <div id="quizModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="quizModalHeading">
+    <div class="quiz-modal-box">
+      <div class="quiz-top-row">
+        <span class="quiz-block-tag" id="quizModalHeading">❓ BLOK TANDA TANYA (?) EDUKATIF</span>
+        <span style="font-family:var(--font-retro); font-weight:900; font-size:0.85rem; color:#15803d;">
+          HADIAH BENAR: +200 POIN
+        </span>
+      </div>
+
+      <p class="quiz-question-text" id="quizQuestionText">Pertanyaan kuis...</p>
+
+      <div class="quiz-choices" id="quizChoicesContainer">
+        <button type="button" class="choice-btn" data-idx="0" onclick="answerQuiz(0)">
+          <span class="choice-key">A</span>
+          <span id="choiceText0">Pilihan A</span>
+        </button>
+        <button type="button" class="choice-btn" data-idx="1" onclick="answerQuiz(1)">
+          <span class="choice-key">B</span>
+          <span id="choiceText1">Pilihan B</span>
+        </button>
+        <button type="button" class="choice-btn" data-idx="2" onclick="answerQuiz(2)">
+          <span class="choice-key">C</span>
+          <span id="choiceText2">Pilihan C</span>
+        </button>
+      </div>
+
+      <div id="quizFeedbackBox" class="feedback-box hidden">
+        <h3 class="feedback-heading" id="quizFeedbackHeading">Hasil</h3>
+        <p class="feedback-body" id="quizFeedbackBody">Pembahasan...</p>
+      </div>
+
+      <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <span style="font-size:0.82rem; font-weight:700; color:#64748b;">
+          Tekan tombol <strong>A/B/C</strong> atau <strong>1/2/3</strong> di keyboard untuk menjawab.
+        </span>
+        <button type="button" class="btn btn-blue btn-lg hidden" id="btnContinueAfterQuiz" onclick="closeQuizAndResume()">
+          Lanjutkan Petualangan ➡️
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================================
+       1. SYNTHESIZED 8-BIT WEB AUDIO API SOUND EFFECTS
+       ===================================================================== */
+    class RetroAudio8Bit {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+
+      unlock() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playTone(freq, type, duration, vol, delay = 0, slideTo = null) {
+        if (this.muted) return;
+        this.unlock();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime + delay;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        if (slideTo !== null) {
+          osc.frequency.exponentialRampToValueAtTime(Math.max(40, slideTo), now + duration);
+        }
+        gain.gain.setValueAtTime(vol, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+      }
+
+      jump() {
+        this.playTone(220, 'square', 0.14, 0.11, 0, 560);
+      }
+
+      bumpQuiz() {
+        this.playTone(330, 'square', 0.08, 0.12, 0, 440);
+        this.playTone(587.33, 'square', 0.14, 0.12, 0.08, 783.99);
+      }
+
+      correct() {
+        this.playTone(523.25, 'square', 0.11, 0.13, 0);
+        this.playTone(659.25, 'square', 0.11, 0.13, 0.10);
+        this.playTone(783.99, 'square', 0.11, 0.13, 0.20);
+        this.playTone(1046.5, 'square', 0.24, 0.14, 0.30);
+      }
+
+      wrong() {
+        this.playTone(260, 'sawtooth', 0.16, 0.12, 0, 190);
+        this.playTone(180, 'sawtooth', 0.22, 0.12, 0.16, 120);
+      }
+
+      coin() {
+        this.playTone(987.77, 'square', 0.07, 0.11, 0);
+        this.playTone(1318.51, 'square', 0.16, 0.11, 0.07);
+      }
+
+      powerup() {
+        const notes = [392, 493.88, 587.33, 783.99, 987.77];
+        notes.forEach((n, idx) => this.playTone(n, 'square', 0.08, 0.12, idx * 0.065));
+      }
+
+      stomp() {
+        this.playTone(460, 'square', 0.07, 0.13, 0, 140);
+        this.playTone(620, 'square', 0.08, 0.1, 0.07);
+      }
+
+      hurt() {
+        this.playTone(300, 'sawtooth', 0.14, 0.14, 0, 150);
+        this.playTone(170, 'sawtooth', 0.22, 0.14, 0.13, 85);
+      }
+
+      win() {
+        const fanfare = [
+          { f: 523.25, d: 0.12, t: 0.0 },
+          { f: 659.25, d: 0.12, t: 0.13 },
+          { f: 783.99, d: 0.12, t: 0.26 },
+          { f: 1046.5, d: 0.22, t: 0.39 },
+          { f: 783.99, d: 0.12, t: 0.64 },
+          { f: 1046.5, d: 0.36, t: 0.78 }
+        ];
+        fanfare.forEach(n => this.playTone(n.f, 'square', n.d, 0.14, n.t));
+      }
+
+      gameOver() {
+        const notes = [392, 369.99, 349.23, 329.63, 261.63];
+        notes.forEach((n, idx) => this.playTone(n, 'sawtooth', 0.18, 0.12, idx * 0.17));
+      }
+    }
+
+    const sound8Bit = new RetroAudio8Bit();
+
+    function toggleMute() {
+      sound8Bit.muted = !sound8Bit.muted;
+      document.getElementById('muteIcon').textContent = sound8Bit.muted ? '🔇' : '🔊';
+      document.getElementById('muteLabel').textContent = sound8Bit.muted ? 'Suara 8-Bit: OFF' : 'Suara 8-Bit: ON';
+      if (!sound8Bit.muted) sound8Bit.coin();
+    }
+
+    /* =====================================================================
+       2. KEYWORD-AWARE QUESTION GENERATOR & QUESTION BANK STATE
+       ===================================================================== */
+    const DEFAULT_QUESTIONS = [
+      {
+        q: 'Dalam suatu ekosistem sawah, organisme yang berperan sebagai produsen penghasil makanan sendiri adalah...',
+        opts: ['Padi dan rumput hijau', 'Tikus sawah dan belalang', 'Ular sawah dan burung hantu', 'Jamur dan bakteri pengurai'],
+        ans: 0,
+        exp: 'Tumbuhan hijau seperti padi berperan sebagai produsen karena mampu membuat makanan sendiri melalui fotosintesis.'
+      },
+      {
+        q: 'Urutan rantai makanan yang benar di ekosistem kebun adalah...',
+        opts: [
+          'Ulat → Daun → Burung → Elang',
+          'Daun → Ulat → Burung → Elang',
+          'Burung → Daun → Ulat → Elang',
+          'Elang → Burung → Ulat → Daun'
+        ],
+        ans: 1,
+        exp: 'Energi mengalir dari produsen (daun) ke konsumen I (ulat), konsumen II (burung), lalu konsumen puncak (elang).'
+      },
+      {
+        q: 'Apa peran penting dekomposer (pengurai) seperti cacing tanah, jamur, dan bakteri dalam ekosistem?',
+        opts: [
+          'Memburu mangsa berukuran besar',
+          'Menguraikan sisa makhluk hidup mati menjadi zat hara bagi tanah',
+          'Menghasilkan cahaya matahari buatan',
+          'Menghambat pertumbuhan tanaman'
+        ],
+        ans: 1,
+        exp: 'Dekomposer menguraikan bahan organik mati menjadi zat hara sederhana yang menyuburkan tanah bagi produsen.'
+      },
+      {
+        q: 'Jika populasi katak menurun drastis akibat perburuan, dampak langsung pada rantai makanan sawah adalah...',
+        opts: [
+          'Populasi serangga/belalang cenderung meningkat',
+          'Populasi padi langsung bertambah dua kali lipat',
+          'Sinar matahari tidak sampai ke sawah',
+          'Semua hewan di sawah berhenti bernapas'
+        ],
+        ans: 0,
+        exp: 'Katak memangsa serangga; berkurangnya katak membuat pemangsa serangga berkurang sehingga populasi serangga dapat meningkat.'
+      },
+      {
+        q: 'Hubungan saling ketergantungan antara makhluk hidup dan lingkungannya disebut...',
+        opts: ['Adaptasi', 'Ekosistem', 'Metamorfosis', 'Fotosintesis'],
+        ans: 1,
+        exp: 'Ekosistem merupakan kesatuan komunitas makhluk hidup (biotik) dan benda tak hidup (abiotik) yang saling berinteraksi.'
+      }
+    ];
+
+    let appData = {
+      subject: 'IPA Kelas 5 - Ekosistem & Rantai Makanan',
+      goal: 'Siswa mampu memahami konsep dasar ekosistem dan rantai makanan',
+      questions: DEFAULT_QUESTIONS.map(item => ({ ...item, opts: [...item.opts] }))
+    };
+
+    function generateQuestionsFromGoal() {
+      const subjectVal = (document.getElementById('subjectTitleInput').value || '').trim();
+      const goalVal = (document.getElementById('learningGoalInput').value || '').trim();
+      const combined = `${subjectVal} ${goalVal}`.toLowerCase();
+
+      // Extract a clean topic phrase from learning goal
+      const topicPhrase = extractTopicPhrase(goalVal, subjectVal);
+
+      let generated = [];
+
+      if (hasAnyKeyword(combined, ['ekosistem', 'rantai makanan', 'produsen', 'konsumen', 'dekomposer', 'pengurai', 'jaring'])) {
+        generated = [
+          {
+            q: `Berdasarkan tujuan "${topicPhrase}", komponen biotik yang berperan sebagai produsen utama adalah...`,
+            opts: ['Tumbuhan hijau berfotosintesis', 'Hewan karnivora pemangsa', 'Batu, air, dan udara', 'Cacing pengurai sisa bangkai'],
+            ans: 0,
+            exp: 'Produsen (seperti tumbuhan hijau) menghasilkan energi kimia dari cahaya matahari untuk menopang rantai makanan.'
+          },
+          {
+            q: `Dalam rantai makanan sesuai topik "${topicPhrase}", hewan pemakan tumbuhan disebut...`,
+            opts: ['Konsumen tingkat I (herbivora)', 'Dekomposer (pengurai)', 'Produsen primer', 'Komponen abiotik'],
+            ans: 0,
+            exp: 'Konsumen tingkat I memakan produsen secara langsung sehingga energi berpindah dari tumbuhan ke hewan herbivora.'
+          },
+          {
+            q: `Mengapa keseimbangan ekosistem pada "${topicPhrase}" perlu dijaga?`,
+            opts: [
+              'Agar aliran energi dan populasi makhluk hidup tetap stabil',
+              'Supaya satu jenis hewan menguasai seluruh habitat',
+              'Agar tumbuhan tidak perlu cahaya matahari',
+              'Supaya semua predator punah'
+            ],
+            ans: 0,
+            exp: 'Keseimbangan ekosistem menjaga kelangsungan hidup setiap komponen agar tidak terjadi ledakan atau kepunahan populasi.'
+          },
+          {
+            q: `Organisme pengurai (dekomposer) berperan penting karena...`,
+            opts: [
+              'Mengembalikan zat hara ke tanah dari makhluk hidup yang mati',
+              'Menghasilkan oksigen saat malam hari saja',
+              'Menjadi sumber energi utama bagi matahari',
+              'Mengubah air menjadi batuan'
+            ],
+            ans: 0,
+            exp: 'Pengurai memecah sisa organisme mati menjadi mineral/zat hara yang dimanfaatkan kembali oleh tumbuhan.'
+          },
+          {
+            q: `Contoh interaksi komponen biotik dan abiotik dalam "${topicPhrase}" adalah...`,
+            opts: [
+              'Tanaman menyerap air dan sinar matahari untuk tumbuh',
+              'Kerikil bergerak sendiri mencari air',
+              'Angin makan daun di pohon',
+              'Tanah memakan akar tumbuhan'
+            ],
+            ans: 0,
+            exp: 'Tanaman (biotik) memanfaatkan air dan cahaya matahari (abiotik) untuk bertahan hidup dan tumbuh.'
+          }
+        ];
+      } else if (hasAnyKeyword(combined, ['pecahan', 'rasio', 'perbandingan', 'matematika', 'desimal', 'persen'])) {
+        generated = [
+          {
+            q: `Untuk mencapai tujuan "${topicPhrase}", nilai rasio satuan dari 24 apel dalam 4 keranjang sama banyak adalah...`,
+            opts: ['6 apel per keranjang', '4 apel per keranjang', '8 apel per keranjang', '20 apel per keranjang'],
+            ans: 0,
+            exp: 'Rasio satuan dihitung dengan membagi jumlah total dengan banyaknya satuan: 24 ÷ 4 = 6 apel per keranjang.'
+          },
+          {
+            q: `Jika 3 buku tulis berharga Rp15.000, berapakah harga satuan 1 buku tulis dalam konteks "${topicPhrase}"?`,
+            opts: ['Rp5.000', 'Rp3.000', 'Rp12.000', 'Rp45.000'],
+            ans: 0,
+            exp: 'Harga per 1 satuan = Rp15.000 ÷ 3 = Rp5.000 per buku.'
+          },
+          {
+            q: `Pecahan 1/2 jika dinyatakan dalam bentuk pecahan senilai berpenyebut 6 adalah...`,
+            opts: ['3/6', '2/6', '4/6', '1/6'],
+            ans: 0,
+            exp: 'Pembilang dan penyebut 1/2 dikalikan 3 sehingga menjadi 3/6.'
+          },
+          {
+            q: `Sebuah mobil menempuh 120 km dalam 2 jam. Kecepatan rata-rata per jamnya adalah...`,
+            opts: ['60 km/jam', '40 km/jam', '80 km/jam', '240 km/jam'],
+            ans: 0,
+            exp: 'Jarak per 1 jam = 120 km ÷ 2 jam = 60 km/jam.'
+          },
+          {
+            q: `Langkah paling tepat sebelum membandingkan dua besaran dalam "${topicPhrase}" adalah...`,
+            opts: [
+              'Menyamakan satuan atau menyederhanakannya ke bentuk setara',
+              'Menjumlahkan seluruh angka tanpa memperhatikan satuan',
+              'Mengabaikan nilai penyebut',
+              'Mengalikan semua bilangan dengan nol'
+            ],
+            ans: 0,
+            exp: 'Menyamakan satuan atau mencari nilai per satu satuan membuat perbandingan lebih akurat dan mudah dipahami.'
+          }
+        ];
+      } else if (hasAnyKeyword(combined, ['pencernaan', 'lambung', 'usus', 'enzim', 'makanan', 'gizi'])) {
+        generated = [
+          {
+            q: `Sesuai tujuan "${topicPhrase}", organ tempat makanan dihaluskan secara mekanik dan kimiawi dengan asam/enzim adalah...`,
+            opts: ['Lambung', 'Paru-paru', 'Ginjal', 'Jantung'],
+            ans: 0,
+            exp: 'Lambung mengaduk makanan secara mekanik dan mencerna protein dengan bantuan enzim pepsin serta asam lambung.'
+          },
+          {
+            q: `Penyerapan sari-sari makanan ke dalam aliran darah paling banyak terjadi di...`,
+            opts: ['Usus halus', 'Kerongkongan', 'Rongga mulut', 'Tenggorokan'],
+            ans: 0,
+            exp: 'Usus halus memiliki vili (jonjot usus) yang menyerap nutrisi makanan untuk diedarkan ke seluruh tubuh.'
+          },
+          {
+            q: `Enzim ptialin (amilase) di mulut membantu mengubah zat tepung (amilum) menjadi...`,
+            opts: ['Gula sederhana (maltosa)', 'Lemak jenuh', 'Oksigen', 'Serat kasar'],
+            ans: 0,
+            exp: 'Enzim amilase/ptialin mulai memecah karbohidrat kompleks menjadi gula yang lebih sederhana sejak di mulut.'
+          },
+          {
+            q: `Untuk menjaga kesehatan pencernaan terkait "${topicPhrase}", kebiasaan yang baik adalah...`,
+            opts: [
+              'Mengonsumsi serat (sayur & buah), air cukup, dan makan teratur',
+              'Menahan buang air besar terlalu lama',
+              'Jarang minum air putih',
+              'Mengonsumsi makanan basi'
+            ],
+            ans: 0,
+            exp: 'Serat dan air membantu gerak peristaltik usus serta mencegah sembelit.'
+          },
+          {
+            q: `Gerakan meremas dan mendorong makanan di kerongkongan menuju lambung disebut...`,
+            opts: ['Gerak peristaltik', 'Gerak memantul', 'Fotosintesis', 'Penguapan'],
+            ans: 0,
+            exp: 'Gerak peristaltik adalah kontraksi otot saluran pencernaan yang mendorong makanan turun ke lambung.'
+          }
+        ];
+      } else if (hasAnyKeyword(combined, ['tata surya', 'planet', 'bumi', 'matahari', 'fotosintesis', 'energi', 'ipa'])) {
+        generated = [
+          {
+            q: `Dalam topik "${topicPhrase}", tumbuhan hijau memerlukan cahaya matahari untuk proses...`,
+            opts: ['Fotosintesis menghasilkan makanan', 'Membekukan air', 'Menghasilkan angin topan', 'Menghapus gravitasi'],
+            ans: 0,
+            exp: 'Fotosintesis mengubah air dan karbon dioksida menjadi glukosa dan oksigen dengan bantuan cahaya matahari.'
+          },
+          {
+            q: `Planet yang kita tempati dan memiliki atmosfer serta air yang mendukung kehidupan adalah...`,
+            opts: ['Bumi', 'Merkurius', 'Saturnus', 'Neptunus'],
+            ans: 0,
+            exp: 'Bumi berada di zona layak huni dengan air cair, atmosfer pelindung, dan suhu yang mendukung kehidupan.'
+          },
+          {
+            q: `Contoh perubahan energi listrik menjadi energi gerak dalam kehidupan sehari-hari adalah...`,
+            opts: ['Kipas angin yang berputar', 'Lampu senter menyala', 'Setrika memanas', 'Bel berbunyi'],
+            ans: 0,
+            exp: 'Kipas angin mengubah energi listrik menjadi energi gerak baling-baling.'
+          },
+          {
+            q: `Sumber energi cahaya dan panas utama bagi Bumi di tata surya adalah...`,
+            opts: ['Matahari', 'Bulan', 'Komet', 'Asteroid'],
+            ans: 0,
+            exp: 'Matahari adalah bintang pusat tata surya yang memancarkan cahaya dan panas bagi Bumi.'
+          },
+          {
+            q: `Sikap ilmiah yang tepat saat melakukan pengamatan pada "${topicPhrase}" adalah...`,
+            opts: [
+              'Teliti mencatat data dan jujur terhadap hasil pengamatan',
+              'Mengarang hasil tanpa mengamati',
+              'Mengabaikan keselamatan kerja',
+              'Menolak bukti yang terlihat jelas'
+            ],
+            ans: 0,
+            exp: 'Ketelitian dan kejujuran ilmiah merupakan dasar penting dalam mempelajari sains.'
+          }
+        ];
+      } else {
+        // General adaptive templates tailored to any custom learning objective
+        generated = [
+          {
+            q: `Manakah pernyataan yang paling sesuai dengan tujuan pembelajaran "${topicPhrase}"?`,
+            opts: [
+              `Memahami konsep inti dan menerapkan "${topicPhrase}" secara tepat`,
+              'Menghafal tanpa memahami makna konsepnya',
+              'Mengabaikan langkah-langkah penyelesaian',
+              'Menjawab tanpa membaca informasi yang ada'
+            ],
+            ans: 0,
+            exp: `Tujuan pembelajaran "${topicPhrase}" menekankan pemahaman konsep dan penerapannya secara bermakna.`
+          },
+          {
+            q: `Langkah pertama yang sebaiknya dilakukan siswa untuk menguasai "${topicPhrase}" adalah...`,
+            opts: [
+              'Mengenali konsep dasar dan kata kunci utamanya',
+              'Langsung menyerah sebelum mencoba',
+              'Menyalin jawaban tanpa berpikir',
+              'Melewatkan contoh penerapan'
+            ],
+            ans: 0,
+            exp: 'Mengenali konsep dasar dan kata kunci membantu menghubungkan informasi baru dengan pengetahuan awal.'
+          },
+          {
+            q: `Bagaimana cara membuktikan bahwa siswa sudah mencapai "${topicPhrase}"?`,
+            opts: [
+              'Mampu menjelaskan kembali dan menyelesaikan contoh soal terkait',
+              'Hanya membuka halaman buku tanpa membacanya',
+              'Menghindari diskusi kelompok',
+              'Menebak semua jawaban secara acak'
+            ],
+            ans: 0,
+            exp: 'Kemampuan menjelaskan konsep dengan bahasa sendiri dan menyelesaikan latihan menunjukkan pemahaman yang baik.'
+          },
+          {
+            q: `Penerapan "${topicPhrase}" dalam kegiatan sehari-hari dapat membantu kita untuk...`,
+            opts: [
+              'Memecahkan masalah dengan lebih terstruktur dan kritis',
+              'Menambah kebingungan saat belajar',
+              'Menunda pekerjaan penting',
+              'Melupakan aturan dasar'
+            ],
+            ans: 0,
+            exp: 'Pembelajaran yang bermakna membantu kita berpikir kritis dan mengambil keputusan tepat sehari-hari.'
+          },
+          {
+            q: `Sikap belajar yang mendukung tercapainya "${topicPhrase}" di kelas adalah...`,
+            opts: [
+              'Aktif bertanya, berlatih, dan menyimak pembahasan',
+              'Pasif dan tidak mau mencoba',
+              'Mengganggu teman saat berdiskusi',
+              'Mengabaikan umpan balik'
+            ],
+            ans: 0,
+            exp: 'Keaktifan berlatih dan menyimak pembahasan mempercepat penguasaan materi pembelajaran.'
+          }
+        ];
+      }
+
+      appData.questions = generated;
+      renderQuestionLists();
+      updateAutoGenStatus(`✅ Berhasil membuat 5 soal pilihan ganda (A, B, C) otomatis untuk: "${topicPhrase}"!`);
+      showToast('✨ 5 soal otomatis berhasil dibuat!');
+    }
+
+    function hasAnyKeyword(text, keywords) {
+      return keywords.some(kw => text.includes(kw));
+    }
+
+    function extractTopicPhrase(goal, subject) {
+      let clean = goal
+        .replace(/^(siswa|peserta didik)\s+(mampu|dapat|bisa|diharapkan\s+mampu)\s+/i, '')
+        .replace(/memahami\s+(konsep\s+dasar\s+)?/i, '')
+        .trim();
+      if (!clean) clean = subject || 'Tujuan Pembelajaran';
+      if (clean.length > 72) clean = clean.slice(0, 69).trim() + '...';
+      return clean;
+    }
+
+    function updateAutoGenStatus(msg) {
+      document.getElementById('autoGenStatus').textContent = msg;
+    }
+
+    /* =====================================================================
+       3. MANUAL QUESTION EDITOR & SETUP UI
+       ===================================================================== */
+    function switchEditorTab(tab) {
+      const isList = tab === 'list';
+      document.getElementById('tabListBtn').classList.toggle('active', isList);
+      document.getElementById('tabManualBtn').classList.toggle('active', !isList);
+      document.getElementById('tabListPanel').classList.toggle('hidden', !isList);
+      document.getElementById('tabManualPanel').classList.toggle('hidden', isList);
+      renderQuestionLists();
+    }
+
+    function renderQuestionLists() {
+      document.getElementById('activeQCount').textContent = appData.questions.length;
+
+      // Preview list
+      const previewEl = document.getElementById('questionPreviewList');
+      const letters = ['A', 'B', 'C'];
+      previewEl.innerHTML = appData.questions.map((item, idx) => `
+        <div class="q-editor-card">
+          <div class="q-editor-top">
+            <span class="q-badge">SOAL #${idx + 1}</span>
+            <span style="font-size:0.82rem; font-weight:800; color:#15803d;">Kunci: ${letters[item.ans] || 'A'}</span>
+          </div>
+          <div style="font-weight:800; font-size:0.98rem; margin-bottom:6px;">${escapeHtml(item.q)}</div>
+          <div style="font-size:0.88rem; font-weight:600; color:#334155;">
+            A. ${escapeHtml(item.opts[0] || '')} &nbsp;|&nbsp;
+            B. ${escapeHtml(item.opts[1] || '')} &nbsp;|&nbsp;
+            C. ${escapeHtml(item.opts[2] || '')}
+          </div>
+          <div style="font-size:0.82rem; font-weight:700; color:#1e3a8a; margin-top:6px;">
+            💡 Pembahasan: ${escapeHtml(item.exp || '')}
+          </div>
+        </div>
+      `).join('');
+
+      // Manual editor list
+      const editorEl = document.getElementById('questionEditorList');
+      editorEl.innerHTML = appData.questions.map((item, idx) => `
+        <div class="q-editor-card">
+          <div class="q-editor-top">
+            <span class="q-badge">EDIT SOAL #${idx + 1}</span>
+            ${appData.questions.length > 1 ? `
+              <button type="button" class="btn btn-red" style="padding:5px 10px; font-size:0.8rem;" onclick="deleteManualQuestion(${idx})">
+                🗑️ Hapus
+              </button>
+            ` : ''}
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" style="font-size:0.84rem;">Pertanyaan:</label>
+            <input type="text" class="input-retro" value="${escapeHtml(item.q)}" oninput="appData.questions[${idx}].q = this.value" />
+          </div>
+
+          <div class="opts-3-grid">
+            <div class="field-group">
+              <label class="field-label" style="font-size:0.8rem;">Opsi A:</label>
+              <input type="text" class="input-retro" value="${escapeHtml(item.opts[0] || '')}" oninput="appData.questions[${idx}].opts[0] = this.value" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" style="font-size:0.8rem;">Opsi B:</label>
+              <input type="text" class="input-retro" value="${escapeHtml(item.opts[1] || '')}" oninput="appData.questions[${idx}].opts[1] = this.value" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" style="font-size:0.8rem;">Opsi C:</label>
+              <input type="text" class="input-retro" value="${escapeHtml(item.opts[2] || '')}" oninput="appData.questions[${idx}].opts[2] = this.value" />
+            </div>
+          </div>
+
+          <div class="q-meta-row">
+            <div class="field-group">
+              <label class="field-label" style="font-size:0.8rem;">Kunci Jawaban:</label>
+              <select class="select-retro" onchange="appData.questions[${idx}].ans = Number(this.value)">
+                <option value="0" ${item.ans === 0 ? 'selected' : ''}>Pilihan A</option>
+                <option value="1" ${item.ans === 1 ? 'selected' : ''}>Pilihan B</option>
+                <option value="2" ${item.ans === 2 ? 'selected' : ''}>Pilihan C</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label" style="font-size:0.8rem;">Pembahasan Singkat:</label>
+              <input type="text" class="input-retro" value="${escapeHtml(item.exp || '')}" oninput="appData.questions[${idx}].exp = this.value" />
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addManualQuestion() {
+      const nextNum = appData.questions.length + 1;
+      appData.questions.push({
+        q: `Pertanyaan edukasi #${nextNum} tentang ${appData.subject || 'materi pembelajaran'}?`,
+        opts: ['Pilihan jawaban A', 'Pilihan jawaban B', 'Pilihan jawaban C'],
+        ans: 0,
+        exp: 'Penjelasan singkat mengapa pilihan A merupakan jawaban yang tepat.'
+      });
+      renderQuestionLists();
+      showToast('➕ Pertanyaan baru ditambahkan');
+    }
+
+    function deleteManualQuestion(idx) {
+      if (appData.questions.length <= 1) return;
+      appData.questions.splice(idx, 1);
+      renderQuestionLists();
+      showToast('🗑️ Soal dihapus');
+    }
+
+    function saveAndStartGame() {
+      const subj = (document.getElementById('subjectTitleInput').value || '').trim();
+      const goal = (document.getElementById('learningGoalInput').value || '').trim();
+
+      appData.subject = subj || 'Mata Pelajaran & Materi';
+      appData.goal = goal || 'Siswa mampu memahami materi pembelajaran dengan baik.';
+
+      // Sanitize questions so none are empty
+      appData.questions = appData.questions
+        .map((item, i) => ({
+          q: (item.q || '').trim() || `Pertanyaan #${i + 1}`,
+          opts: [
+            (item.opts[0] || '').trim() || 'Opsi A',
+            (item.opts[1] || '').trim() || 'Opsi B',
+            (item.opts[2] || '').trim() || 'Opsi C'
+          ],
+          ans: [0, 1, 2].includes(Number(item.ans)) ? Number(item.ans) : 0,
+          exp: (item.exp || '').trim() || 'Pelajari kembali konsep utama pada tujuan pembelajaran.'
+        }));
+
+      if (appData.questions.length === 0) {
+        appData.questions = DEFAULT_QUESTIONS.map(d => ({ ...d, opts: [...d.opts] }));
+      }
+
+      startLevel();
+    }
+
+    function goToSetup() {
+      game.running = false;
+      game.pausedForQuiz = false;
+      document.getElementById('quizModal').classList.add('hidden');
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('setupScreen').classList.remove('hidden');
+      document.getElementById('btnTopSetup').classList.add('hidden');
+      document.getElementById('btnTopRestart').classList.add('hidden');
+
+      document.getElementById('subjectTitleInput').value = appData.subject;
+      document.getElementById('learningGoalInput').value = appData.goal;
+      renderQuestionLists();
+    }
+
+    /* =====================================================================
+       4. RETRO 2D PLATFORMER ENGINE (CANVAS, PHYSICS, ENTITIES & QUIZ)
+       ===================================================================== */
+    const TILE = 48;
+    const GRAVITY = 1550;
+    const MOVE_SPEED = 275;
+    const JUMP_VEL = -640;
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const keys = { left: false, right: false, jump: false, jumpJustPressed: false };
+
+    let game = {
+      running: false,
+      pausedForQuiz: false,
+      cameraX: 0,
+      worldWidth: 3600,
+      groundY: 444,
+      score: 0,
+      coins: 0,
+      lives: 3,
+      answeredCount: 0,
+      correctCount: 0,
+      activeQuizBlockIndex: null,
+      player: null,
+      tiles: [],
+      coinPickups: [],
+      powerups: [],
+      floatingPopups: [],
+      enemies: [],
+      flagPole: null,
+      animTime: 0
+    };
+
+    function startLevel() {
+      sound8Bit.unlock();
+      document.getElementById('setupScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('quizModal').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+      document.getElementById('btnTopSetup').classList.remove('hidden');
+      document.getElementById('btnTopRestart').classList.remove('hidden');
+
+      game.score = 0;
+      game.coins = 0;
+      game.lives = 3;
+      game.answeredCount = 0;
+      game.correctCount = 0;
+      game.activeQuizBlockIndex = null;
+      game.cameraX = 0;
+      game.floatingPopups = [];
+      game.powerups = [];
+      game.pausedForQuiz = false;
+      game.running = true;
+
+      game.player = {
+        x: 80,
+        y: game.groundY - 40,
+        w: 32,
+        h: 40,
+        vx: 0,
+        vy: 0,
+        onGround: false,
+        facing: 1,
+        big: false,
+        invulnTimer: 0,
+        walkCycle: 0
+      };
+
+      buildLevelWorld();
+      updateHUD();
+      showMissionPopup();
+    }
+
+    function buildLevelWorld() {
+      game.tiles = [];
+      game.coinPickups = [];
+      game.enemies = [];
+
+      const cols = 78; // 78 * 48 = 3744px wide level
+      game.worldWidth = cols * TILE;
+      const groundRow = 9; // 9 * 48 = 432 -> ground top at 432
+      game.groundY = groundRow * TILE;
+
+      // Gaps in ground for classic platforming excitement
+      const gapCols = new Set([18, 19, 36, 37, 56, 57]);
+
+      for (let c = 0; c < cols; c++) {
+        if (!gapCols.has(c)) {
+          game.tiles.push({
+            type: 'ground',
+            x: c * TILE,
+            y: game.groundY,
+            w: TILE,
+            h: canvas.height - game.groundY,
+            bumpOffset: 0
+          });
+        }
+      }
+
+      // Helper to add brick or question block
+      const addBlock = (col, row, type, qIndex = null) => {
+        game.tiles.push({
+          type, // 'brick' | 'question' | 'empty'
+          x: col * TILE,
+          y: row * TILE,
+          w: TILE,
+          h: TILE,
+          qIndex,
+          answered: false,
+          bumpOffset: 0
+        });
+      };
+
+      // Decorative & elevated platforms + bricks
+      for (let c = 6; c <= 9; c++) addBlock(c, 6, 'brick');
+      for (let c = 22; c <= 26; c++) addBlock(c, 6, 'brick');
+      for (let c = 42; c <= 46; c++) addBlock(c, 5, 'brick');
+      for (let c = 61; c <= 64; c++) addBlock(c, 6, 'brick');
+
+      // Place Educational (?) Blocks spaced cleanly across the level
+      const qBlockCoords = [
+        { col: 7, row: 6 },
+        { col: 15, row: 5 },
+        { col: 24, row: 6 },
+        { col: 33, row: 5 },
+        { col: 44, row: 5 },
+        { col: 52, row: 6 },
+        { col: 63, row: 6 }
+      ];
+
+      const numQuestions = appData.questions.length;
+      qBlockCoords.forEach((coord, idx) => {
+        const mappedQ = idx % numQuestions;
+        addBlock(coord.col, coord.row, 'question', mappedQ);
+      });
+
+      // Green Pipes (solid obstacles)
+      const pipeCols = [12, 29, 49, 67];
+      pipeCols.forEach((pCol, i) => {
+        const pipeH = i % 2 === 0 ? 72 : 92;
+        game.tiles.push({
+          type: 'pipe',
+          x: pCol * TILE,
+          y: game.groundY - pipeH,
+          w: TILE + 8,
+          h: pipeH,
+          bumpOffset: 0
+        });
+      });
+
+      // Collectible Gold Coins
+      const coinSpots = [
+        [8, 5], [9, 5], [16, 4], [17, 4],
+        [23, 5], [25, 5], [31, 8], [32, 8],
+        [43, 4], [45, 4], [53, 5], [62, 5], [64, 5]
+      ];
+      coinSpots.forEach(([c, r]) => {
+        game.coinPickups.push({
+          x: c * TILE + TILE / 2,
+          y: r * TILE + TILE / 2,
+          r: 12,
+          collected: false
+        });
+      });
+
+      // Patrol Enemies (Goomba-style retro walkers)
+      const enemySpawns = [
+        { col: 11, minX: 9.5 * TILE, maxX: 17.5 * TILE },
+        { col: 25, minX: 21 * TILE, maxX: 28.5 * TILE },
+        { col: 34, minX: 30.5 * TILE, maxX: 35.5 * TILE },
+        { col: 45, minX: 40 * TILE, maxX: 48.5 * TILE },
+        { col: 60, minX: 58.5 * TILE, maxX: 66.5 * TILE }
+      ];
+
+      enemySpawns.forEach(sp => {
+        game.enemies.push({
+          x: sp.col * TILE,
+          y: game.groundY - 34,
+          w: 34,
+          h: 34,
+          vx: -78,
+          minX: sp.minX,
+          maxX: sp.maxX,
+          alive: true,
+          squishTimer: 0
+        });
+      });
+
+      // Finish Flagpole near end of level
+      game.flagPole = {
+        x: (cols - 5) * TILE + 18,
+        groundY: game.groundY,
+        poleTopY: game.groundY - 220,
+        reached: false
+      };
+    }
+
+    function showMissionPopup() {
+      const toast = document.getElementById('persistentMissionText');
+      toast.textContent = `🎯 Misi Belajar (${appData.subject}): ${appData.goal}`;
+
+      const floating = document.getElementById('levelMissionToast');
+      floating.innerHTML = `🎯 MISI BELAJAR: ${escapeHtml(appData.goal)}`;
+      floating.classList.remove('hidden', 'fade-out');
+
+      clearTimeout(showMissionPopup._tid);
+      showMissionPopup._tid = setTimeout(() => {
+        floating.classList.add('fade-out');
+        setTimeout(() => floating.classList.add('hidden'), 360);
+      }, 3600);
+    }
+
+    function updateHUD() {
+      document.getElementById('hudSubject').textContent = appData.subject.toUpperCase();
+      document.getElementById('hudScore').textContent = String(game.score).padStart(6, '0');
+      document.getElementById('hudCoins').textContent = `x${String(game.coins).padStart(2, '0')}`;
+      document.getElementById('hudLives').textContent = '♥'.repeat(Math.max(0, game.lives)) || '0';
+      document.getElementById('hudQuizProg').textContent = `${game.correctCount}/${appData.questions.length}`;
+      const badge = document.getElementById('hudPowerBadge');
+      if (game.player && game.player.big) {
+        badge.textContent = 'STATUS: JAMUR SUPER (+BESAR)';
+        badge.className = 'hud-val-yellow';
+      } else {
+        badge.textContent = 'STATUS: NORMAL';
+        badge.className = 'hud-val-green';
+      }
+    }
+
+    function addPopupText(x, y, text, color = '#fde047') {
+      game.floatingPopups.push({ x, y, text, color, life: 1.0 });
+    }
+
+    /* =====================================================================
+       5. PHYSICS & COLLISION LOOP
+       ===================================================================== */
+    let lastFrameTime = performance.now();
+
+    function gameLoop(now) {
+      const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+      lastFrameTime = now;
+
+      if (game.running && !game.pausedForQuiz) {
+        game.animTime += dt;
+        updatePlayer(dt);
+        updateEnemies(dt);
+        updatePowerupsAndCoins(dt);
+        updatePopupsAndBlocks(dt);
+        checkFinishFlag();
+      }
+
+      if (!document.getElementById('gameScreen').classList.contains('hidden')) {
+        renderScene();
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function updatePlayer(dt) {
+      const p = game.player;
+      if (p.invulnTimer > 0) p.invulnTimer = Math.max(0, p.invulnTimer - dt);
+
+      // Horizontal movement
+      const moveDir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+      if (moveDir !== 0) {
+        p.vx = moveDir * MOVE_SPEED;
+        p.facing = moveDir;
+        if (p.onGround) p.walkCycle += dt * 13;
+      } else {
+        p.vx = 0;
+        p.walkCycle = 0;
+      }
+
+      // Jump trigger
+      if (keys.jumpJustPressed && p.onGround) {
+        p.vy = JUMP_VEL;
+        p.onGround = false;
+        sound8Bit.jump();
+      }
+      keys.jumpJustPressed = false;
+
+      // Apply gravity
+      p.vy += GRAVITY * dt;
+
+      // Move X and resolve horizontal tile collisions
+      p.x += p.vx * dt;
+      if (p.x < 0) p.x = 0;
+      if (p.x + p.w > game.worldWidth) p.x = game.worldWidth - p.w;
+
+      for (const t of game.tiles) {
+        if (aabbOverlap(p.x, p.y, p.w, p.h, t.x, t.y, t.w, t.h)) {
+          if (p.vx > 0) {
+            p.x = t.x - p.w;
+          } else if (p.vx < 0) {
+            p.x = t.x + t.w;
+          }
+        }
+      }
+
+      // Move Y and resolve vertical collisions (including hitting ? block from below)
+      const prevBottom = p.y + p.h;
+      const prevTop = p.y;
+      p.y += p.vy * dt;
+      p.onGround = false;
+
+      for (const t of game.tiles) {
+        if (aabbOverlap(p.x, p.y, p.w, p.h, t.x, t.y, t.w, t.h)) {
+          if (p.vy > 0 && prevBottom <= t.y + 18) {
+            p.y = t.y - p.h;
+            p.vy = 0;
+            p.onGround = true;
+          } else if (p.vy < 0 && prevTop >= t.y + t.h - 20) {
+            p.y = t.y + t.h;
+            p.vy = 40;
+            onPlayerBumpBlockFromBelow(t);
+          }
+        }
+      }
+
+      // Fall into pit
+      if (p.y > canvas.height + 60) {
+        damagePlayer(true);
+      }
+
+      // Smooth camera follow
+      const targetCam = p.x - canvas.width * 0.35;
+      game.cameraX = Math.max(0, Math.min(game.worldWidth - canvas.width, targetCam));
+    }
+
+    function onPlayerBumpBlockFromBelow(tile) {
+      if (tile.type === 'question' && !tile.answered) {
+        tile.bumpOffset = -10;
+        sound8Bit.bumpQuiz();
+        openQuizForBlock(tile);
+      } else if (tile.type === 'brick' || tile.type === 'question') {
+        tile.bumpOffset = -7;
+        sound8Bit.bumpQuiz();
+      }
+    }
+
+    function updateEnemies(dt) {
+      const p = game.player;
+
+      for (const e of game.enemies) {
+        if (!e.alive) {
+          if (e.squishTimer > 0) e.squishTimer -= dt;
+          continue;
+        }
+
+        e.x += e.vx * dt;
+        if (e.x <= e.minX) {
+          e.x = e.minX;
+          e.vx = Math.abs(e.vx);
+        } else if (e.x + e.w >= e.maxX) {
+          e.x = e.maxX - e.w;
+          e.vx = -Math.abs(e.vx);
+        }
+
+        if (aabbOverlap(p.x, p.y, p.w, p.h, e.x, e.y, e.w, e.h)) {
+          const stompingFromAbove = p.vy > 0 && (p.y + p.h - p.vy * dt) <= e.y + 14;
+          if (stompingFromAbove) {
+            e.alive = false;
+            e.squishTimer = 0.35;
+            p.vy = JUMP_VEL * 0.68;
+            game.score += 150;
+            sound8Bit.stomp();
+            addPopupText(e.x + e.w / 2, e.y - 8, '+150', '#4ade80');
+            updateHUD();
+          } else if (p.invulnTimer <= 0) {
+            damagePlayer(false);
+          }
+        }
+      }
+    }
+
+    function updatePowerupsAndCoins(dt) {
+      const p = game.player;
+
+      // Collect gold coins
+      for (const c of game.coinPickups) {
+        if (c.collected) continue;
+        const dx = (p.x + p.w / 2) - c.x;
+        const dy = (p.y + p.h / 2) - c.y;
+        if (Math.hypot(dx, dy) < c.r + Math.max(p.w, p.h) * 0.45) {
+          c.collected = true;
+          game.coins += 1;
+          game.score += 100;
+          sound8Bit.coin();
+          addPopupText(c.x, c.y - 10, '+100 KOIN!', '#fde047');
+          updateHUD();
+        }
+      }
+
+      // Update spawned Power-Up Mushrooms
+      for (const m of game.powerups) {
+        if (!m.active) continue;
+        m.x += m.vx * dt;
+        m.vy += GRAVITY * 0.7 * dt;
+        m.y += m.vy * dt;
+
+        if (m.y + m.h >= game.groundY) {
+          m.y = game.groundY - m.h;
+          m.vy = 0;
+        }
+
+        for (const t of game.tiles) {
+          if (t.type !== 'ground' && aabbOverlap(m.x, m.y, m.w, m.h, t.x, t.y, t.w, t.h)) {
+            if (m.vy > 0 && (m.y + m.h - m.vy * dt) <= t.y + 14) {
+              m.y = t.y - m.h;
+              m.vy = 0;
+            } else {
+              m.vx *= -1;
+            }
+          }
+        }
+
+        if (aabbOverlap(p.x, p.y, p.w, p.h, m.x, m.y, m.w, m.h)) {
+          m.active = false;
+          if (!p.big) {
+            p.big = true;
+            p.y -= 12;
+            p.h = 52;
+            p.w = 36;
+          }
+          game.score += 200;
+          sound8Bit.powerup();
+          addPopupText(p.x + p.w / 2, p.y - 12, 'SUPER JAMUR +200!', '#4ade80');
+          updateHUD();
+        }
+      }
+    }
+
+    function updatePopupsAndBlocks(dt) {
+      for (const t of game.tiles) {
+        if (t.bumpOffset < 0) {
+          t.bumpOffset = Math.min(0, t.bumpOffset + 55 * dt);
+        }
+      }
+
+      for (let i = game.floatingPopups.length - 1; i >= 0; i--) {
+        const pop = game.floatingPopups[i];
+        pop.y -= 36 * dt;
+        pop.life -= dt * 1.1;
+        if (pop.life <= 0) {
+          game.floatingPopups.splice(i, 1);
+        }
+      }
+    }
+
+    function damagePlayer(fellInPit) {
+      const p = game.player;
+
+      if (!fellInPit && p.big) {
+        // Shrink from big power-up state instead of losing a life
+        p.big = false;
+        p.h = 40;
+        p.w = 32;
+        p.invulnTimer = 1.5;
+        sound8Bit.hurt();
+        addPopupText(p.x + p.w / 2, p.y - 10, 'MENGECIL!', '#fca5a5');
+        updateHUD();
+        return;
+      }
+
+      game.lives -= 1;
+      updateHUD();
+
+      if (game.lives <= 0) {
+        game.running = false;
+        sound8Bit.gameOver();
+        showResultScreen(false);
+        return;
+      }
+
+      sound8Bit.hurt();
+      const respawnX = Math.max(60, game.cameraX + 70);
+      p.x = respawnX;
+      p.y = game.groundY - p.h - 10;
+      p.vx = 0;
+      p.vy = 0;
+      p.invulnTimer = 1.6;
+      addPopupText(p.x + p.w / 2, p.y - 12, '-1 NYAWA', '#f87171');
+    }
+
+    function checkFinishFlag() {
+      const p = game.player;
+      const fp = game.flagPole;
+      if (!fp || fp.reached) return;
+
+      if (p.x + p.w >= fp.x - 10) {
+        fp.reached = true;
+        game.running = false;
+        game.score += 500;
+        updateHUD();
+        sound8Bit.win();
+        showResultScreen(true);
+      }
+    }
+
+    function aabbOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+      return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+    }
+
+    /* =====================================================================
+       6. EDUCATIONAL QUIZ MODAL FROM (?) BLOCKS
+       ===================================================================== */
+    function openQuizForBlock(tile) {
+      game.pausedForQuiz = true;
+      game.activeQuizBlockIndex = game.tiles.indexOf(tile);
+
+      // Clear any held movement keys while paused
+      keys.left = false;
+      keys.right = false;
+      keys.jump = false;
+
+      const qItem = appData.questions[tile.qIndex % appData.questions.length];
+
+      document.getElementById('quizModalHeading').textContent = `❓ BLOK TANDA TANYA (?) • ${appData.subject}`;
+      document.getElementById('quizQuestionText').textContent = qItem.q;
+
+      [0, 1, 2].forEach(idx => {
+        const btn = document.querySelector(`.choice-btn[data-idx="${idx}"]`);
+        btn.disabled = false;
+        btn.classList.remove('is-correct', 'is-wrong');
+        document.getElementById(`choiceText${idx}`).textContent = qItem.opts[idx];
+      });
+
+      const fb = document.getElementById('quizFeedbackBox');
+      fb.classList.add('hidden');
+      fb.classList.remove('feedback-ok', 'feedback-err');
+
+      document.getElementById('btnContinueAfterQuiz').classList.add('hidden');
+      document.getElementById('quizModal').classList.remove('hidden');
+    }
+
+    function answerQuiz(chosenIdx) {
+      const modal = document.getElementById('quizModal');
+      if (modal.classList.contains('hidden')) return;
+
+      const btnContinue = document.getElementById('btnContinueAfterQuiz');
+      if (!btnContinue.classList.contains('hidden')) return; // Already answered
+
+      const tile = game.tiles[game.activeQuizBlockIndex];
+      const qItem = appData.questions[tile.qIndex % appData.questions.length];
+      const isCorrect = chosenIdx === qItem.ans;
+
+      game.answeredCount += 1;
+
+      const choiceBtns = document.querySelectorAll('.choice-btn');
+      choiceBtns.forEach((b, idx) => {
+        b.disabled = true;
+        if (idx === qItem.ans) b.classList.add('is-correct');
+        else if (idx === chosenIdx && !isCorrect) b.classList.add('is-wrong');
+      });
+
+      const fb = document.getElementById('quizFeedbackBox');
+      const fbHead = document.getElementById('quizFeedbackHeading');
+      const fbBody = document.getElementById('quizFeedbackBody');
+      fb.classList.remove('hidden');
+
+      if (isCorrect) {
+        game.correctCount += 1;
+        game.score += 200;
+        tile.type = 'empty';
+        tile.answered = true;
+        sound8Bit.correct();
+
+        // Spawn Power-Up Mushroom every 2nd correct answer, otherwise reward coin + popup
+        if (game.correctCount % 2 === 0) {
+          game.powerups.push({
+            x: tile.x + 8,
+            y: tile.y - 34,
+            w: 32,
+            h: 32,
+            vx: 110,
+            vy: -220,
+            active: true
+          });
+          sound8Bit.powerup();
+          addPopupText(tile.x + 24, tile.y - 16, 'JAMUR MUNCUL! +200', '#4ade80');
+        } else {
+          game.coins += 1;
+          sound8Bit.coin();
+          addPopupText(tile.x + 24, tile.y - 16, 'BENAR! +200 POIN', '#fde047');
+        }
+
+        fb.classList.add('feedback-ok');
+        fbHead.textContent = '🎉 LUAR BIASA! JAWABAN BENAR (+200 POIN)';
+        fbBody.textContent = `Apresiasi hebat! ${qItem.exp}`;
+      } else {
+        // Keep block accessible so student can try again later without immediate Game Over
+        sound8Bit.wrong();
+        fb.classList.add('feedback-err');
+        const letters = ['A', 'B', 'C'];
+        fbHead.textContent = `💡 BELUM TEPAT — KUNCI JAWABAN: ${letters[qItem.ans]}`;
+        fbBody.textContent = `${qItem.exp} Kamu bisa melanjutkan petualangan dan menyundul blok (?) lagi untuk mencoba lagi!`;
+      }
+
+      updateHUD();
+      btnContinue.classList.remove('hidden');
+      btnContinue.focus();
+    }
+
+    function closeQuizAndResume() {
+      document.getElementById('quizModal').classList.add('hidden');
+      game.pausedForQuiz = false;
+      game.activeQuizBlockIndex = null;
+      lastFrameTime = performance.now();
+    }
+
+    /* =====================================================================
+       7. PROCEDURAL RETRO 2D CANVAS RENDERER
+       ===================================================================== */
+    function renderScene() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Sky background
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, game.groundY);
+      skyGrad.addColorStop(0, '#5c94fc');
+      skyGrad.addColorStop(1, '#93c5fd');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Parallax retro clouds & distant hills
+      drawParallaxScenery();
+
+      ctx.save();
+      ctx.translate(-Math.round(game.cameraX), 0);
+
+      // Draw Finish Flagpole
+      drawFlagpole(game.flagPole);
+
+      // Draw Tiles (Ground, Brick, Question Block, Pipe)
+      for (const t of game.tiles) {
+        if (t.x + t.w < game.cameraX - 60 || t.x > game.cameraX + canvas.width + 60) continue;
+        if (t.type === 'ground') drawGroundTile(t);
+        else if (t.type === 'brick') drawBrickTile(t);
+        else if (t.type === 'question') drawQuestionTile(t);
+        else if (t.type === 'empty') drawEmptyTile(t);
+        else if (t.type === 'pipe') drawPipeTile(t);
+      }
+
+      // Draw Spinning Gold Coins
+      for (const c of game.coinPickups) {
+        if (!c.collected) drawGoldCoin(c);
+      }
+
+      // Draw Power-Up Mushrooms
+      for (const m of game.powerups) {
+        if (m.active) drawMushroom(m);
+      }
+
+      // Draw Patrol Enemies
+      for (const e of game.enemies) {
+        if (e.alive || e.squishTimer > 0) drawEnemy(e);
+      }
+
+      // Draw Red-Cap Hero
+      drawHero(game.player);
+
+      // Draw Floating Popups
+      for (const pop of game.floatingPopups) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, pop.life);
+        ctx.font = '900 16px "Courier New", monospace';
+        ctx.textAlign = 'center';
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#0f172a';
+        ctx.strokeText(pop.text, pop.x, pop.y);
+        ctx.fillStyle = pop.color;
+        ctx.fillText(pop.text, pop.x, pop.y);
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    function drawParallaxScenery() {
+      // Distant green hills
+      ctx.fillStyle = '#4ade80';
+      for (let i = 0; i < 8; i++) {
+        const hx = i * 260 - (game.cameraX * 0.25) % 260;
+        ctx.beginPath();
+        ctx.arc(hx + 120, game.groundY, 95, Math.PI, 0);
+        ctx.fill();
+      }
+
+      // Fluffy retro clouds
+      ctx.fillStyle = '#ffffff';
+      for (let i = 0; i < 6; i++) {
+        const cx = i * 240 - (game.cameraX * 0.4) % 240;
+        const cy = 75 + (i % 2) * 38;
+        ctx.beginPath();
+        ctx.arc(cx + 25, cy, 22, 0, Math.PI * 2);
+        ctx.arc(cx + 48, cy - 8, 26, 0, Math.PI * 2);
+        ctx.arc(cx + 72, cy, 20, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawGroundTile(t) {
+      // Soil body
+      ctx.fillStyle = '#c84c0c';
+      ctx.fillRect(t.x, t.y, t.w, t.h);
+
+      // Grass top strip
+      ctx.fillStyle = '#43b047';
+      ctx.fillRect(t.x, t.y, t.w, 12);
+      ctx.fillStyle = '#86efac';
+      ctx.fillRect(t.x, t.y, t.w, 4);
+
+      // Retro brick/soil texture lines
+      ctx.strokeStyle = '#7c2d12';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(t.x + 1, t.y + 1, t.w - 2, t.h - 2);
+    }
+
+    function drawBrickTile(t) {
+      const y = t.y + t.bumpOffset;
+      ctx.fillStyle = '#d97706';
+      ctx.fillRect(t.x, y, t.w, t.h);
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(t.x + 1.5, y + 1.5, t.w - 3, t.h - 3);
+
+      // Mortar lines
+      ctx.beginPath();
+      ctx.moveTo(t.x, y + t.h / 2);
+      ctx.lineTo(t.x + t.w, y + t.h / 2);
+      ctx.moveTo(t.x + t.w / 2, y);
+      ctx.lineTo(t.x + t.w / 2, y + t.h / 2);
+      ctx.moveTo(t.x + t.w / 4, y + t.h / 2);
+      ctx.lineTo(t.x + t.w / 4, y + t.h);
+      ctx.stroke();
+    }
+
+    function drawQuestionTile(t) {
+      const y = t.y + t.bumpOffset;
+      const pulse = Math.sin(game.animTime * 6) * 0.08 + 0.92;
+
+      ctx.fillStyle = '#fbd000';
+      ctx.fillRect(t.x, y, t.w, t.h);
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(t.x + 1.5, y + 1.5, t.w - 3, t.h - 3);
+
+      // Corner rivets
+      ctx.fillStyle = '#92400e';
+      ctx.fillRect(t.x + 5, y + 5, 4, 4);
+      ctx.fillRect(t.x + t.w - 9, y + 5, 4, 4);
+      ctx.fillRect(t.x + 5, y + t.h - 9, 4, 4);
+      ctx.fillRect(t.x + t.w - 9, y + t.h - 9, 4, 4);
+
+      // Question mark glyph
+      ctx.save();
+      ctx.translate(t.x + t.w / 2, y + t.h / 2 + 2);
+      ctx.scale(pulse, pulse);
+      ctx.font = '900 26px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#0f172a';
+      ctx.fillText('?', 0, 0);
+      ctx.restore();
+    }
+
+    function drawEmptyTile(t) {
+      const y = t.y + t.bumpOffset;
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(t.x, y, t.w, t.h);
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(t.x + 1.5, y + 1.5, t.w - 3, t.h - 3);
+    }
+
+    function drawPipeTile(t) {
+      // Pipe shaft
+      ctx.fillStyle = '#22c55e';
+      ctx.fillRect(t.x + 4, t.y + 18, t.w - 8, t.h - 18);
+      ctx.fillStyle = '#86efac';
+      ctx.fillRect(t.x + 10, t.y + 18, 8, t.h - 18);
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(t.x + 4, t.y + 18, t.w - 8, t.h - 18);
+
+      // Pipe lip
+      ctx.fillStyle = '#16a34a';
+      ctx.fillRect(t.x, t.y, t.w, 20);
+      ctx.fillStyle = '#bbf7d0';
+      ctx.fillRect(t.x + 6, t.y + 3, 9, 14);
+      ctx.strokeRect(t.x, t.y, t.w, 20);
+    }
+
+    function drawGoldCoin(c) {
+      const spinScale = Math.max(0.25, Math.abs(Math.cos(game.animTime * 5 + c.x * 0.02)));
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.scale(spinScale, 1);
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, c.r, c.r + 2, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#fbd000';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#0f172a';
+      ctx.stroke();
+
+      ctx.fillStyle = '#fef9c3';
+      ctx.fillRect(-2, -7, 4, 14);
+      ctx.restore();
+    }
+
+    function drawMushroom(m) {
+      // Stem
+      ctx.fillStyle = '#fef3c7';
+      ctx.fillRect(m.x + 7, m.y + 16, m.w - 14, m.h - 16);
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(m.x + 7, m.y + 16, m.w - 14, m.h - 16);
+
+      // Red cap
+      ctx.beginPath();
+      ctx.arc(m.x + m.w / 2, m.y + 17, 15, Math.PI, 0);
+      ctx.closePath();
+      ctx.fillStyle = '#e52521';
+      ctx.fill();
+      ctx.stroke();
+
+      // White spots
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(m.x + 10, m.y + 9, 4, 0, Math.PI * 2);
+      ctx.arc(m.x + 22, m.y + 9, 4, 0, Math.PI * 2);
+      ctx.arc(m.x + 16, m.y + 5, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawEnemy(e) {
+      ctx.save();
+      if (!e.alive) {
+        // Squished enemy
+        ctx.fillStyle = '#92400e';
+        ctx.fillRect(e.x, e.y + e.h - 10, e.w, 10);
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(e.x, e.y + e.h - 10, e.w, 10);
+        ctx.restore();
+        return;
+      }
+
+      const stepBob = Math.sin(game.animTime * 14 + e.x * 0.05) * 2;
+      ctx.translate(e.x + e.w / 2, e.y + e.h / 2 + stepBob);
+
+      // Feet
+      const footShift = Math.sin(game.animTime * 14) * 5;
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(-13 + footShift, 10, 10, 7);
+      ctx.fillRect(3 - footShift, 10, 10, 7);
+
+      // Mushroom-like patrol head
+      ctx.beginPath();
+      ctx.arc(0, -2, 16, Math.PI, 0);
+      ctx.lineTo(14, 11);
+      ctx.lineTo(-14, 11);
+      ctx.closePath();
+      ctx.fillStyle = '#b45309';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#0f172a';
+      ctx.stroke();
+
+      // Angry retro eyes
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(-9, -4, 6, 7);
+      ctx.fillRect(3, -4, 6, 7);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(-7, -2, 3, 4);
+      ctx.fillRect(5, -2, 3, 4);
+
+      ctx.restore();
+    }
+
+    function drawHero(p) {
+      if (p.invulnTimer > 0 && Math.floor(p.invulnTimer * 16) % 2 === 0) {
+        return; // Blink during invulnerability
+      }
+
+      ctx.save();
+      const cx = p.x + p.w / 2;
+      const bottomY = p.y + p.h;
+
+      ctx.translate(cx, bottomY);
+      ctx.scale(p.facing, 1);
+
+      const scaleFactor = p.big ? 1.25 : 1.0;
+      ctx.scale(scaleFactor, scaleFactor);
+
+      const legSwing = p.onGround ? Math.sin(p.walkCycle) * 6 : 5;
+
+      // Boots / Legs
+      ctx.fillStyle = '#7c2d12';
+      ctx.fillRect(-10 + legSwing, -9, 8, 9);
+      ctx.fillRect(2 - legSwing, -9, 8, 9);
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 2.2;
+      ctx.strokeRect(-10 + legSwing, -9, 8, 9);
+      ctx.strokeRect(2 - legSwing, -9, 8, 9);
+
+      // Blue Overalls / Shirt
+      ctx.fillStyle = '#2563eb';
+      ctx.fillRect(-11, -22, 22, 14);
+      ctx.strokeRect(-11, -22, 22, 14);
+
+      // Gold overall buttons
+      ctx.fillStyle = '#fbd000';
+      ctx.fillRect(-8, -19, 3, 3);
+      ctx.fillRect(5, -19, 3, 3);
+
+      // Face
+      ctx.fillStyle = '#fed7aa';
+      ctx.fillRect(-10, -34, 20, 12);
+      ctx.strokeRect(-10, -34, 20, 12);
+
+      // Eye
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(3, -31, 3, 5);
+
+      // Classic Red Cap + Brim
+      ctx.fillStyle = '#e52521';
+      ctx.fillRect(-11, -41, 22, 8);
+      ctx.fillRect(-11, -35, 28, 3.5);
+      ctx.strokeRect(-11, -41, 22, 8);
+
+      ctx.restore();
+    }
+
+    function drawFlagpole(fp) {
+      if (!fp) return;
+      // Base block
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(fp.x - 14, fp.groundY - 18, 36, 18);
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(fp.x - 14, fp.groundY - 18, 36, 18);
+
+      // Pole
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillRect(fp.x, fp.poleTopY, 8, fp.groundY - fp.poleTopY - 18);
+      ctx.strokeRect(fp.x, fp.poleTopY, 8, fp.groundY - fp.poleTopY - 18);
+
+      // Top orb
+      ctx.beginPath();
+      ctx.arc(fp.x + 4, fp.poleTopY - 4, 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#fbd000';
+      ctx.fill();
+      ctx.stroke();
+
+      // Green/Gold Finish Flag
+      const wave = Math.sin(game.animTime * 8) * 3;
+      ctx.beginPath();
+      ctx.moveTo(fp.x + 8, fp.poleTopY + 8);
+      ctx.lineTo(fp.x + 54, fp.poleTopY + 22 + wave);
+      ctx.lineTo(fp.x + 8, fp.poleTopY + 38);
+      ctx.closePath();
+      ctx.fillStyle = '#22c55e';
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    /* =====================================================================
+       8. CERTIFICATE / RESULT SCREEN
+       ===================================================================== */
+    function showResultScreen(won) {
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('quizModal').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+
+      const acc = game.answeredCount > 0
+        ? Math.round((game.correctCount / game.answeredCount) * 100)
+        : 0;
+
+      document.getElementById('resultBadge').textContent = won
+        ? '🏆 SERTIFIKAT PENYELESAIAN MISI'
+        : '📘 RINGKASAN HASIL BELAJAR';
+
+      document.getElementById('resultTitle').textContent = won
+        ? 'SELAMAT! KAMU MENCAPAI GARIS FINIS!'
+        : 'PETUALANGAN SELESAI — AYO COBA LAGI!';
+
+      document.getElementById('resultSubjectLine').textContent = `Materi: ${appData.subject}`;
+      document.getElementById('resultGoalText').textContent = appData.goal;
+
+      document.getElementById('statScore').textContent = String(game.score);
+      document.getElementById('statAccuracy').textContent = `${acc}%`;
+      document.getElementById('statCorrect').textContent = `${game.correctCount}/${game.answeredCount}`;
+      document.getElementById('statCoins').textContent = String(game.coins);
+
+      document.getElementById('resultMessage').textContent = won
+        ? `Hebat! Kamu telah menyelesaikan tantangan "${appData.goal}" dengan penuh semangat.`
+        : `Setiap percobaan menambah pemahaman! Pelajari kembali pembahasan kuis dan lanjutkan misimu.`;
+    }
+
+    /* =====================================================================
+       9. KEYBOARD & TOUCH CONTROLS + UTILITIES
+       ===================================================================== */
+    window.addEventListener('keydown', (e) => {
+      // Handle quiz shortcuts A/B/C or 1/2/3 when modal is open
+      const quizOpen = !document.getElementById('quizModal').classList.contains('hidden');
+      if (quizOpen) {
+        const k = e.key.toLowerCase();
+        if (k === 'a' || k === '1') { e.preventDefault(); answerQuiz(0); return; }
+        if (k === 'b' || k === '2') { e.preventDefault(); answerQuiz(1); return; }
+        if (k === 'c' || k === '3') { e.preventDefault(); answerQuiz(2); return; }
+        if (k === 'enter' || k === ' ') {
+          const contBtn = document.getElementById('btnContinueAfterQuiz');
+          if (!contBtn.classList.contains('hidden')) {
+            e.preventDefault();
+            closeQuizAndResume();
+          }
+        }
+        return;
+      }
+
+      if (!game.running || game.pausedForQuiz) return;
+
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+        keys.left = true;
+      } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+        keys.right = true;
+      } else if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+        e.preventDefault();
+        if (!keys.jump) keys.jumpJustPressed = true;
+        keys.jump = true;
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+        keys.left = false;
+      } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+        keys.right = false;
+      } else if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+        keys.jump = false;
+      }
+    });
+
+    function bindTouchButton(btnId, onDown, onUp) {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+
+      const start = (e) => {
+        e.preventDefault();
+        btn.classList.add('pressed');
+        onDown();
+      };
+      const end = (e) => {
+        e.preventDefault();
+        btn.classList.remove('pressed');
+        onUp();
+      };
+
+      btn.addEventListener('pointerdown', start);
+      btn.addEventListener('pointerup', end);
+      btn.addEventListener('pointerleave', end);
+      btn.addEventListener('pointercancel', end);
+    }
+
+    bindTouchButton('touchLeft', () => { keys.left = true; }, () => { keys.left = false; });
+    bindTouchButton('touchRight', () => { keys.right = true; }, () => { keys.right = false; });
+    bindTouchButton(
+      'touchJump',
+      () => {
+        if (!keys.jump) keys.jumpJustPressed = true;
+        keys.jump = true;
+      },
+      () => { keys.jump = false; }
+    );
+
+    function showToast(msg) {
+      const bar = document.getElementById('toastBar');
+      bar.textContent = msg;
+      bar.classList.add('show');
+      clearTimeout(bar._tid);
+      bar._tid = setTimeout(() => bar.classList.remove('show'), 2400);
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = String(str ?? '');
+      return div.innerHTML;
+    }
+
+    window.onload = function () {
+      renderQuestionLists();
+      requestAnimationFrame(gameLoop);
+    };
+  </script>
+</body>
+</html>

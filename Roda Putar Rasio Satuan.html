@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roda Putar Rasio Satuan – Kuis Interaktif Kelas</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top left, #e0f2fe 0%, #f0fdf4 48%, #fefce8 100%);
+            min-height: 100vh;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, .font-display {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* 3D Tactile Buttons */
+        .btn-push {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            position: relative;
+            top: 0;
+        }
+        .btn-push:active:not(:disabled) {
+            top: 3px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2) !important;
+        }
+        .btn-push:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        /* Pointer Bounce Animation on Wheel Tick */
+        @keyframes pointerTick {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            35% { transform: translateX(-50%) rotate(-24deg); }
+            100% { transform: translateX(-50%) rotate(0deg); }
+        }
+        .pointer-ticking {
+            animation: pointerTick 0.14s ease-out;
+        }
+
+        /* Modal Pop-in */
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9) translateY(16px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-pop {
+            animation: popIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        #confetti-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- =====================================================================
+         TOP NAVBAR: TITLE, SETTINGS, MODE & AUDIO CONTROLS
+         ===================================================================== -->
+    <header class="bg-white/90 backdrop-blur-md border-b-2 border-sky-200 shadow-sm sticky top-0 z-30">
+        <div class="max-w-[1440px] mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
+            <!-- Brand -->
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex items-center justify-center text-white text-2xl shadow-md border-2 border-white">
+                    🎡
+                </div>
+                <div>
+                    <h1 class="font-display font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
+                        Roda Putar <span class="text-sky-600">Rasio Satuan</span>
+                    </h1>
+                    <p class="text-xs font-semibold text-slate-500 hidden sm:block">
+                        Kuis Matematika Interaktif Kelas • Soal Setara &amp; Giliran Merata
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="openSetupModal()" class="btn-push bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-[0_3px_0_#0369a1] flex items-center gap-1.5">
+                    <span>👥</span> <span>Atur Siswa (<span id="header-student-count">0</span>)</span>
+                </button>
+
+                <button onclick="openSummaryModal()" class="btn-push bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-[0_3px_0_#047857] flex items-center gap-1.5">
+                    <span>🏆</span> <span class="hidden md:inline">Rekap Skor</span>
+                </button>
+
+                <button onclick="toggleMute()" id="btn-audio" class="btn-push bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-[0_3px_0_#b45309] flex items-center gap-1.5">
+                    <span id="audio-icon">🔊</span> <span id="audio-label" class="hidden sm:inline">Suara Aktif</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- =====================================================================
+         MAIN WORKSPACE: SPIN WHEEL (LEFT) + CLASS ROSTER & SCOREBOARD (RIGHT)
+         ===================================================================== -->
+    <main class="flex-1 max-w-[1440px] w-full mx-auto px-3 sm:px-6 py-4 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+        <!-- LEFT / CENTER: INTERACTIVE SPIN WHEEL STAGE -->
+        <section class="lg:col-span-7 xl:col-span-8 bg-white/95 rounded-3xl border-2 border-sky-200 shadow-xl p-4 sm:p-6 flex flex-col items-center">
+
+            <!-- Quick Quiz Options Bar (Answer Mode & Timer) -->
+            <div class="w-full flex flex-wrap items-center justify-between gap-2 bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 mb-4 text-xs sm:text-sm">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-slate-600">Mode Jawab:</span>
+                    <select id="answer-mode-select" onchange="updateQuizSettings()" class="bg-white border-2 border-sky-200 rounded-xl px-2.5 py-1 font-bold text-slate-800 focus:outline-none focus:border-sky-500">
+                        <option value="mcq">Pilihan Ganda (4 Opsi)</option>
+                        <option value="input">Isian Angka</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-slate-600">⏱️ Timer:</span>
+                    <select id="timer-select" onchange="updateQuizSettings()" class="bg-white border-2 border-sky-200 rounded-xl px-2.5 py-1 font-bold text-slate-800 focus:outline-none focus:border-sky-500">
+                        <option value="0">Tanpa Batas</option>
+                        <option value="30">30 Detik</option>
+                        <option value="45" selected>45 Detik</option>
+                        <option value="60">60 Detik</option>
+                    </select>
+                </div>
+
+                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" id="fair-turn-toggle" checked onchange="toggleFairMode()" class="w-4 h-4 accent-emerald-600 rounded">
+                    <span class="font-bold text-emerald-800">Giliran Merata</span>
+                </label>
+            </div>
+
+            <!-- Status / Turn Progress Pill -->
+            <div id="turn-status-banner" class="mb-3 px-4 py-1.5 rounded-full bg-amber-100 border border-amber-300 text-amber-900 font-bold text-xs sm:text-sm text-center">
+                Sisa giliran putaran ini: <span id="remaining-count">0</span> dari <span id="total-count-pill">0</span> siswa
+            </div>
+
+            <!-- Wheel Canvas Wrapper -->
+            <div class="relative w-full max-w-[520px] aspect-square flex items-center justify-center my-1">
+                <!-- Outer Decorative Rim Glow -->
+                <div class="absolute inset-2 rounded-full bg-gradient-to-tr from-sky-400 via-amber-300 to-rose-400 p-2 shadow-2xl">
+                    <div class="w-full h-full rounded-full bg-slate-900"></div>
+                </div>
+
+                <!-- Top Pointer Indicator -->
+                <div id="wheel-pointer" class="absolute -top-2 left-1/2 -translate-x-1/2 z-20 drop-shadow-[0_5px_6px_rgba(0,0,0,0.45)]">
+                    <svg width="54" height="58" viewBox="0 0 54 58" fill="none">
+                        <path d="M27 56L5 14C2.5 9 6 3 12 3H42C48 3 51.5 9 49 14L27 56Z" fill="#ef4444" stroke="#ffffff" stroke-width="4"/>
+                        <circle cx="27" cy="15" r="6" fill="#fef08a"/>
+                    </svg>
+                </div>
+
+                <!-- HTML5 Canvas Wheel -->
+                <canvas id="wheel-canvas" class="relative z-10 w-[94%] h-[94%] rounded-full cursor-pointer" onclick="spinWheel()"></canvas>
+
+                <!-- Center Hub Button -->
+                <button id="center-spin-btn" onclick="spinWheel()" title="Klik untuk Memutar Roda" class="absolute z-20 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-b from-white to-slate-100 border-4 border-amber-400 shadow-[0_6px_16px_rgba(0,0,0,0.35)] flex flex-col items-center justify-center hover:scale-105 active:scale-95 transition-transform">
+                    <span class="font-display font-bold text-base sm:text-lg text-slate-900 leading-none">PUTAR</span>
+                    <span class="text-[10px] font-extrabold text-amber-600 mt-0.5">SPASI</span>
+                </button>
+            </div>
+
+            <!-- Main Spin Action Bar -->
+            <div class="mt-4 flex flex-wrap items-center justify-center gap-3 w-full">
+                <button id="btn-spin-main" onclick="spinWheel()" class="btn-push bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-display font-bold text-lg sm:text-2xl px-8 py-3.5 rounded-2xl shadow-[0_5px_0_#065f46] flex items-center gap-2.5">
+                    <span>🎯 PUTAR RODA SEKARANG</span>
+                </button>
+
+                <button onclick="resetTurnsOnly()" class="btn-push bg-slate-100 hover:bg-slate-200 text-slate-700 border-2 border-slate-300 font-bold text-xs sm:text-sm px-4 py-3.5 rounded-2xl shadow-[0_3px_0_#cbd5e1] flex items-center gap-1.5" title="Reset tanda sudah dipanggil agar semua siswa masuk roda lagi">
+                    <span>🔄 Reset Giliran</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- RIGHT SIDEBAR: STUDENT SCOREBOARD & TURN STATUS -->
+        <aside class="lg:col-span-5 xl:col-span-4 bg-white/95 rounded-3xl border-2 border-emerald-200 shadow-xl p-4 sm:p-5 flex flex-col max-h-[820px]">
+            <div class="flex items-center justify-between pb-3 mb-3 border-b-2 border-slate-100">
+                <div>
+                    <h2 class="font-display font-bold text-xl text-slate-900 flex items-center gap-2">
+                        <span>📋 Daftar Siswa &amp; Skor</span>
+                    </h2>
+                    <p class="text-xs font-semibold text-slate-500">
+                        Soal tersedia: <span id="bank-count-label" class="text-sky-700 font-bold">40</span> soal setara
+                    </p>
+                </div>
+                <button onclick="resetAllScoresAndTurns()" class="text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-2.5 py-1.5 rounded-xl">
+                    Reset Skor
+                </button>
+            </div>
+
+            <!-- Legend -->
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-xl mb-2.5">
+                <span>🟢 Belum dipanggil</span>
+                <span>✅ Sudah mendapat giliran</span>
+            </div>
+
+            <!-- Scrollable Student List -->
+            <div id="scoreboard-list" class="flex-1 overflow-y-auto space-y-2 pr-1">
+                <!-- Rendered by JS -->
+            </div>
+        </aside>
+    </main>
+
+    <!-- =====================================================================
+         MODAL 1: MANAJEMEN PESERTA DIDIK (JUMLAH & NAMA SISWA)
+         ===================================================================== -->
+    <div id="setup-modal" class="hidden fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
+        <div class="animate-pop bg-white w-full max-w-3xl rounded-3xl border-4 border-sky-400 shadow-2xl p-5 sm:p-7 max-h-[92vh] flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b-2 border-slate-100">
+                <div>
+                    <h2 class="font-display font-bold text-2xl text-slate-900">👥 Pengaturan Peserta Didik</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 font-semibold">Atur jumlah siswa (2–40) dan masukkan nama peserta didik di kelas.</p>
+                </div>
+                <button onclick="closeSetupModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 font-bold text-slate-600">✕</button>
+            </div>
+
+            <!-- Controls Row: Student Count & Quick Fill -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 my-4 bg-sky-50 p-3.5 rounded-2xl border border-sky-200 items-center">
+                <div class="sm:col-span-5 flex items-center gap-2">
+                    <label for="input-student-count" class="font-bold text-sm text-sky-950 whitespace-nowrap">Jumlah Siswa:</label>
+                    <input type="number" id="input-student-count" min="2" max="40" value="12" onchange="handleCountInputChange(this.value)" class="w-20 px-3 py-1.5 rounded-xl border-2 border-sky-300 font-extrabold text-center text-slate-900 bg-white">
+                    <button onclick="applyStudentCount()" class="btn-push bg-sky-600 text-white font-bold text-xs px-3 py-2 rounded-xl">Terapkan</button>
+                </div>
+
+                <div class="sm:col-span-7 flex flex-wrap sm:justify-end gap-2">
+                    <button onclick="fillSampleClass()" class="btn-push bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3 py-2 rounded-xl shadow-[0_2px_0_#b45309]">
+                        ✨ Isi Contoh Nama Kelas
+                    </button>
+                    <button onclick="toggleBulkPaste()" class="btn-push bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-xl shadow-[0_2px_0_#3730a3]">
+                        📋 Tempel Daftar Nama
+                    </button>
+                    <button onclick="clearAllNames()" class="btn-push bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs px-3 py-2 rounded-xl shadow-[0_2px_0_#9f1239]">
+                        🗑️ Reset Nama
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bulk Paste Box (Hidden by default) -->
+            <div id="bulk-paste-box" class="hidden mb-4 bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-3.5">
+                <label class="block text-xs font-bold text-indigo-950 mb-1.5">
+                    Tempel daftar nama siswa dari Excel/Word/WhatsApp (pisahkan dengan baris baru atau koma, maksimal 40 siswa):
+                </label>
+                <textarea id="bulk-names-textarea" rows="4" placeholder="Contoh:&#10;Ahmad Fauzi&#10;Siti Nurhaliza&#10;Budi Santoso&#10;Dewi Lestari" class="w-full p-2.5 rounded-xl border-2 border-indigo-200 text-sm font-semibold focus:outline-none focus:border-indigo-500"></textarea>
+                <div class="flex justify-end gap-2 mt-2">
+                    <button onclick="toggleBulkPaste()" class="text-xs font-bold text-slate-600 px-3 py-1.5">Batal</button>
+                    <button onclick="importBulkNames()" class="btn-push bg-indigo-600 text-white font-bold text-xs px-4 py-1.5 rounded-xl">Gunakan Daftar Ini</button>
+                </div>
+            </div>
+
+            <!-- Individual Name Inputs Grid -->
+            <div id="setup-names-grid" class="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pr-1 py-1">
+                <!-- Populated dynamically -->
+            </div>
+
+            <!-- Save Footer -->
+            <div class="pt-4 mt-3 border-t-2 border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs font-semibold text-slate-500">Tips: Skor siswa yang sudah ada tetap tersimpan saat mengedit nama.</span>
+                <button onclick="saveSetupAndClose()" class="btn-push bg-emerald-600 hover:bg-emerald-700 text-white font-display font-bold text-base px-6 py-2.5 rounded-2xl shadow-[0_4px_0_#047857]">
+                    💾 Simpan &amp; Tampilkan Roda
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL 2: KARTU KUIS INTERAKTIF RASIO SATUAN
+         ===================================================================== -->
+    <div id="quiz-modal" class="hidden fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+        <div class="animate-pop bg-white w-full max-w-3xl rounded-3xl border-4 border-amber-400 shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
+
+            <!-- Top Student Turn Banner -->
+            <div class="bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 text-white px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-400 text-slate-900 font-display font-bold text-2xl flex items-center justify-center shadow border-2 border-white">
+                        🎓
+                    </div>
+                    <div>
+                        <span class="text-[11px] uppercase tracking-wider font-extrabold text-sky-200 block">Giliran Menjawab:</span>
+                        <h2 id="quiz-student-name" class="font-display font-bold text-2xl sm:text-3xl text-white leading-tight">
+                            Nama Siswa
+                        </h2>
+                    </div>
+                </div>
+
+                <!-- Timer & Swap Question Button -->
+                <div class="flex items-center gap-2">
+                    <div id="quiz-timer-badge" class="hidden bg-slate-900/40 border border-white/30 px-3.5 py-1.5 rounded-2xl font-display font-bold text-lg text-amber-300">
+                        ⏱️ <span id="quiz-timer-seconds">45</span>d
+                    </div>
+                    <button id="btn-swap-question" onclick="swapSimilarQuestion()" title="Ganti dengan soal Rasio Satuan sejenis lainnya" class="btn-push bg-white/20 hover:bg-white/30 text-white border border-white/40 font-bold text-xs sm:text-sm px-3 py-2 rounded-xl flex items-center gap-1.5">
+                        <span>🔀</span> <span>Ganti Soal Sejenis</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question Body -->
+            <div class="p-5 sm:p-7 overflow-y-auto flex-1">
+                <div class="flex items-center justify-between mb-2">
+                    <span id="quiz-category-tag" class="inline-block bg-amber-100 text-amber-900 border border-amber-300 font-extrabold text-xs px-3 py-1 rounded-full">
+                        📐 Rasio Satuan • Level Setara
+                    </span>
+                    <span class="text-xs font-bold text-slate-400" id="quiz-number-tag">Soal #1</span>
+                </div>
+
+                <!-- Story Problem Text -->
+                <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 sm:p-6 mb-5">
+                    <p id="quiz-question-text" class="font-bold text-lg sm:text-2xl text-slate-900 leading-relaxed">
+                        Memuat soal rasio satuan...
+                    </p>
+                </div>
+
+                <!-- MODE A: MULTIPLE CHOICE OPTIONS -->
+                <div id="quiz-mcq-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                    <!-- Option buttons A, B, C, D -->
+                </div>
+
+                <!-- MODE B: NUMERIC INPUT -->
+                <div id="quiz-input-container" class="hidden mb-4">
+                    <label class="block font-bold text-sm text-slate-700 mb-2">
+                        Masukkan jawaban angka rasio satuan (<span id="quiz-unit-hint" class="text-sky-700">satuan</span>):
+                    </label>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="relative flex-1 flex items-center">
+                            <span id="quiz-prefix-label" class="hidden pl-4 pr-2 py-3.5 bg-slate-100 border-2 border-r-0 border-slate-300 rounded-l-2xl font-extrabold text-lg text-slate-700">Rp</span>
+                            <input type="text" id="quiz-numeric-input" inputmode="decimal" placeholder="Ketik angka jawaban..." onkeydown="if(event.key==='Enter') submitNumericAnswer()" class="w-full px-4 py-3.5 border-2 border-sky-300 rounded-2xl font-extrabold text-xl text-slate-900 focus:outline-none focus:border-sky-600">
+                            <span id="quiz-suffix-label" class="pl-3 pr-4 py-3.5 font-bold text-sm sm:text-base text-slate-600 whitespace-nowrap">per satuan</span>
+                        </div>
+                        <button id="btn-submit-numeric" onclick="submitNumericAnswer()" class="btn-push bg-emerald-600 hover:bg-emerald-700 text-white font-display font-bold text-lg px-7 py-3.5 rounded-2xl shadow-[0_4px_0_#047857]">
+                            Cek Jawaban ✓
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Feedback & Step-by-Step Solution -->
+                <div id="quiz-feedback-panel" class="hidden rounded-2xl p-4 sm:p-5 border-2 mt-2">
+                    <div class="flex items-center gap-2.5 mb-1.5">
+                        <span id="feedback-icon" class="text-2xl">🎉</span>
+                        <h3 id="feedback-title" class="font-display font-bold text-xl">Benar Sekali! (+100 Poin)</h3>
+                    </div>
+                    <div class="bg-white/80 rounded-xl p-3 border border-black/10 text-sm sm:text-base text-slate-800">
+                        <span class="font-extrabold text-slate-900">💡 Langkah Penyelesaian:</span>
+                        <p id="feedback-explanation" class="font-semibold mt-0.5"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 border-t-2 border-slate-200 px-5 py-3.5 flex items-center justify-between">
+                <button onclick="skipStudentTurn()" id="btn-skip-turn" class="text-xs sm:text-sm font-bold text-slate-500 hover:text-slate-700">
+                    Lewati Giliran
+                </button>
+                <button id="btn-next-spin" onclick="closeQuizAndContinue()" class="hidden btn-push bg-sky-600 hover:bg-sky-700 text-white font-display font-bold text-base sm:text-lg px-7 py-2.5 rounded-2xl shadow-[0_4px_0_#0369a1]">
+                    Lanjut Putar Roda 🎡
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL 3: REKAP SKOR & PODIUM JUARA KELAS
+         ===================================================================== -->
+    <div id="summary-modal" class="hidden fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
+        <div class="animate-pop bg-white w-full max-w-2xl rounded-3xl border-4 border-amber-400 shadow-2xl p-5 sm:p-7 max-h-[90vh] flex flex-col">
+            <div class="text-center mb-4">
+                <div class="text-5xl mb-1">🏆</div>
+                <h2 id="summary-title" class="font-display font-bold text-2xl sm:text-3xl text-slate-900">
+                    Rekap Skor Rasio Satuan
+                </h2>
+                <p id="summary-subtitle" class="text-sm font-semibold text-slate-600">
+                    Peringkat perolehan poin peserta didik di kelas
+                </p>
+            </div>
+
+            <div id="summary-ranking-list" class="flex-1 overflow-y-auto space-y-2 pr-1 mb-5">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 pt-3 border-t-2 border-slate-100">
+                <button onclick="closeSummaryModal()" class="btn-push bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-5 py-2.5 rounded-2xl">
+                    Tutup
+                </button>
+                <button onclick="restartWholeGame()" class="btn-push bg-emerald-600 hover:bg-emerald-700 text-white font-display font-bold px-6 py-2.5 rounded-2xl shadow-[0_4px_0_#047857]">
+                    🔄 Mulai Ulang Permainan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         JAVASCRIPT ENGINE: SOUND, WHEEL PHYSICS, 40 UNIT RATE QUESTIONS
+         ===================================================================== -->
+    <script>
+        /* =====================================================================
+           1. WEB AUDIO API SOUND EFFECTS (NO EXTERNAL AUDIO FILES)
+           ===================================================================== */
+        class ClassroomAudio {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+
+            ensureContext() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioCtx();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playTone(freq, type = 'sine', duration = 0.12, gainVal = 0.15, delay = 0) {
+                if (this.muted) return;
+                this.ensureContext();
+                const now = this.ctx.currentTime + delay;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, now);
+                gain.gain.setValueAtTime(gainVal, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + duration);
+            }
+
+            playTick() {
+                this.playTone(720, 'triangle', 0.045, 0.14, 0);
+            }
+
+            playSelected() {
+                this.playTone(523.25, 'sine', 0.14, 0.18, 0);
+                this.playTone(659.25, 'sine', 0.14, 0.18, 0.1);
+                this.playTone(783.99, 'triangle', 0.28, 0.2, 0.2);
+            }
+
+            playCorrect() {
+                const notes = [523.25, 659.25, 783.99, 1046.5];
+                notes.forEach((f, i) => this.playTone(f, 'triangle', 0.22, 0.18, i * 0.09));
+            }
+
+            playWrong() {
+                this.playTone(250, 'sawtooth', 0.2, 0.12, 0);
+                this.playTone(195, 'sawtooth', 0.3, 0.12, 0.16);
+            }
+
+            playCelebration() {
+                const melody = [523.25, 523.25, 659.25, 783.99, 659.25, 1046.5];
+                melody.forEach((f, i) => this.playTone(f, 'triangle', 0.24, 0.2, i * 0.13));
+            }
+        }
+
+        const audio = new ClassroomAudio();
+
+        function toggleMute() {
+            audio.muted = !audio.muted;
+            document.getElementById('audio-icon').textContent = audio.muted ? '🔇' : '🔊';
+            document.getElementById('audio-label').textContent = audio.muted ? 'Suara Mati' : 'Suara Aktif';
+        }
+
+        /* =====================================================================
+           2. BANK SOAL RASIO SATUAN (40 SOAL CERITA SETARA / LEVEL SERAGAM)
+           ===================================================================== */
+        const UNIT_RATE_QUESTIONS = [
+            // --- KATEGORI 1: HARGA SATUAN BARANG & BELANJA ---
+            {
+                category: '🛒 Harga Satuan',
+                question: 'Ibu membeli 4 buku tulis di koperasi sekolah dengan total harga Rp24.000. Berapakah harga untuk 1 buku tulis?',
+                answer: 6000,
+                prefix: 'Rp',
+                unit: 'per buku',
+                options: ['Rp4.000', 'Rp5.000', 'Rp6.000', 'Rp8.000'],
+                explanation: 'Rp24.000 ÷ 4 buku = Rp6.000 per buku.'
+            },
+            {
+                category: '🛒 Harga Satuan',
+                question: 'Harga 5 buah pensil warna yang sama adalah Rp15.000. Berapakah rasio harga satuan untuk 1 pensil warna?',
+                answer: 3000,
+                prefix: 'Rp',
+                unit: 'per pensil',
+                options: ['Rp2.500', 'Rp3.000', 'Rp3.500', 'Rp5.000'],
+                explanation: 'Rp15.000 ÷ 5 pensil = Rp3.000 per pensil.'
+            },
+            {
+                category: '🛒 Harga Satuan',
+                question: 'Ayah membeli 3 kg buah jeruk dengan harga Rp45.000. Berapa harga jeruk per 1 kg?',
+                answer: 15000,
+                prefix: 'Rp',
+                unit: 'per kg',
+                options: ['Rp12.000', 'Rp15.000', 'Rp18.000', 'Rp20.000'],
+                explanation: 'Rp45.000 ÷ 3 kg = Rp15.000 per kg.'
+            },
+            {
+                category: '🛒 Harga Satuan',
+                question: 'Sebuah paket berisi 6 botol air mineral dijual seharga Rp18.000. Berapakah harga 1 botol air mineral?',
+                answer: 3000,
+                prefix: 'Rp',
+                unit: 'per botol',
+                options: ['Rp2.000', 'Rp3.000', 'Rp4.000', 'Rp6.000'],
+                explanation: 'Rp18.000 ÷ 6 botol = Rp3.000 per botol.'
+            },
+            {
+                category: '🛒 Harga Satuan',
+                question: 'Siti membayar Rp32.000 untuk membeli 4 porsi soto ayam yang sama. Berapa harga 1 porsi soto ayam?',
+                answer: 8000,
+                prefix: 'Rp',
+                unit: 'per porsi',
+                options: ['Rp6.000', 'Rp7.000', 'Rp8.000', 'Rp9.000'],
+                explanation: 'Rp32.000 ÷ 4 porsi = Rp8.000 per porsi.'
+            },
+            {
+                category: '🛒 Harga Satuan',
+                question: 'Harga 8 buah penghapus karakter adalah Rp16.000. Berapa harga untuk 1 buah penghapus?',
+                answer: 2000,
+                prefix: 'Rp',
+                unit: 'per penghapus',
+                options: ['Rp1.500', 'Rp2.000', 'Rp2.500', 'Rp4.000'],
+                explanation: 'Rp16.000 ÷ 8 penghapus = Rp2.000 per penghapus.'
+            },
+            {
+                category: '🛒 Harga Satuan',
+                question: 'Paman membeli 5 liter bensin Pertalite dengan membayar Rp50.000. Berapakah harga 1 liter bensin tersebut?',
+                answer: 10000,
+                prefix: 'Rp',
+                unit: 'per liter',
+                options: ['Rp8.000', 'Rp9.000', 'Rp10.000', 'Rp12.000'],
+                explanation: 'Rp50.000 ÷ 5 liter = Rp10.000 per liter.'
+            },
+            {
+                category: '🛒 Harga Satuan',
+                question: 'Harga 6 potong kue bolu di toko roti adalah Rp30.000. Berapakah harga untuk 1 potong kue bolu?',
+                answer: 5000,
+                prefix: 'Rp',
+                unit: 'per potong',
+                options: ['Rp4.000', 'Rp5.000', 'Rp6.000', 'Rp7.500'],
+                explanation: 'Rp30.000 ÷ 6 potong = Rp5.000 per potong.'
+            },
+            {
+                category: '🛒 Harga Satuan',
+                question: 'Kakak membeli 4 kg beras seharga Rp56.000. Berapakah harga beras untuk setiap 1 kg?',
+                answer: 14000,
+                prefix: 'Rp',
+                unit: 'per kg',
+                options: ['Rp12.000', 'Rp13.000', 'Rp14.000', 'Rp16.000'],
+                explanation: 'Rp56.000 ÷ 4 kg = Rp14.000 per kg.'
+            },
+            {
+                category: '🛒 Harga Satuan',
+                question: 'Tiket masuk kebun binatang untuk 5 anak adalah Rp75.000. Berapakah harga tiket masuk untuk 1 anak?',
+                answer: 15000,
+                prefix: 'Rp',
+                unit: 'per anak',
+                options: ['Rp12.500', 'Rp15.000', 'Rp17.500', 'Rp25.000'],
+                explanation: 'Rp75.000 ÷ 5 anak = Rp15.000 per anak.'
+            },
+
+            // --- KATEGORI 2: KECEPATAN & JARAK PER WAKTU ---
+            {
+                category: '🚗 Kecepatan Satuan',
+                question: 'Sebuah mobil menempuh jarak 180 km dalam waktu 3 jam dengan kecepatan tetap. Berapa km jarak yang ditempuh mobil dalam 1 jam?',
+                answer: 60,
+                prefix: '',
+                unit: 'km/jam',
+                options: ['45 km/jam', '50 km/jam', '60 km/jam', '90 km/jam'],
+                explanation: '180 km ÷ 3 jam = 60 km per jam.'
+            },
+            {
+                category: '🚲 Kecepatan Satuan',
+                question: 'Budi bersepeda sejauh 24 km dalam waktu 2 jam. Berapakah kecepatan rata-rata sepeda Budi per jam?',
+                answer: 12,
+                prefix: '',
+                unit: 'km/jam',
+                options: ['10 km/jam', '12 km/jam', '14 km/jam', '16 km/jam'],
+                explanation: '24 km ÷ 2 jam = 12 km per jam.'
+            },
+            {
+                category: '🚌 Kecepatan Satuan',
+                question: 'Sebuah bus pariwisata melaju sejauh 200 km dalam waktu 4 jam. Berapakah rasio jarak per 1 jam bus tersebut?',
+                answer: 50,
+                prefix: '',
+                unit: 'km/jam',
+                options: ['40 km/jam', '50 km/jam', '60 km/jam', '80 km/jam'],
+                explanation: '200 km ÷ 4 jam = 50 km per jam.'
+            },
+            {
+                category: '🏃 Kecepatan Satuan',
+                question: 'Seorang pelari mampu menempuh jarak 400 meter dalam waktu 2 menit. Berapa meter jarak yang ditempuh dalam 1 menit?',
+                answer: 200,
+                prefix: '',
+                unit: 'meter/menit',
+                options: ['100 meter/menit', '150 meter/menit', '200 meter/menit', '250 meter/menit'],
+                explanation: '400 meter ÷ 2 menit = 200 meter per menit.'
+            },
+            {
+                category: '🚆 Kecepatan Satuan',
+                question: 'Kereta api menempuh perjalanan sejauh 320 km selama 4 jam. Berapakah kecepatan kereta api tersebut dalam km/jam?',
+                answer: 80,
+                prefix: '',
+                unit: 'km/jam',
+                options: ['70 km/jam', '75 km/jam', '80 km/jam', '90 km/jam'],
+                explanation: '320 km ÷ 4 jam = 80 km per jam.'
+            },
+            {
+                category: '🛵 Kecepatan Satuan',
+                question: 'Ayah mengendarai sepeda motor sejauh 90 km dalam waktu 2 jam. Berapa km jarak yang ditempuh dalam 1 jam?',
+                answer: 45,
+                prefix: '',
+                unit: 'km/jam',
+                options: ['40 km/jam', '45 km/jam', '50 km/jam', '60 km/jam'],
+                explanation: '90 km ÷ 2 jam = 45 km per jam.'
+            },
+
+            // --- KATEGORI 3: KONSUMSI BAHAN BAKAR & DEBIT AIR ---
+            {
+                category: '⛽ Jarak per Liter',
+                question: 'Sepeda motor membutuhkan 3 liter bensin untuk menempuh jarak 120 km. Berapa km jarak yang dapat ditempuh dengan 1 liter bensin?',
+                answer: 40,
+                prefix: '',
+                unit: 'km/liter',
+                options: ['30 km/liter', '35 km/liter', '40 km/liter', '45 km/liter'],
+                explanation: '120 km ÷ 3 liter = 40 km per liter.'
+            },
+            {
+                category: '⛽ Jarak per Liter',
+                question: 'Sebuah mobil menghabiskan 5 liter bahan bakar untuk perjalanan sejauh 75 km. Berapa km jarak tempuh per 1 liter bahan bakar?',
+                answer: 15,
+                prefix: '',
+                unit: 'km/liter',
+                options: ['12 km/liter', '15 km/liter', '18 km/liter', '25 km/liter'],
+                explanation: '75 km ÷ 5 liter = 15 km per liter.'
+            },
+            {
+                category: '🚰 Debit Air',
+                question: 'Sebuah keran air mengalirkan 60 liter air ke dalam bak dalam waktu 5 menit. Berapa liter air yang mengalir setiap 1 menit?',
+                answer: 12,
+                prefix: '',
+                unit: 'liter/menit',
+                options: ['10 liter/menit', '12 liter/menit', '15 liter/menit', '20 liter/menit'],
+                explanation: '60 liter ÷ 5 menit = 12 liter per menit.'
+            },
+            {
+                category: '🚰 Debit Air',
+                question: 'Pompa air dapat mengisi tangki sebanyak 150 liter dalam waktu 3 menit. Berapakah debit air pompa tersebut per 1 menit?',
+                answer: 50,
+                prefix: '',
+                unit: 'liter/menit',
+                options: ['30 liter/menit', '45 liter/menit', '50 liter/menit', '75 liter/menit'],
+                explanation: '150 liter ÷ 3 menit = 50 liter per menit.'
+            },
+
+            // --- KATEGORI 4: PRODUKTIVITAS, WAKTU & PEKERJAAN ---
+            {
+                category: '⌨️ Kecepatan Kerja',
+                question: 'Rina dapat mengetik 240 kata dalam waktu 4 menit. Berapakah kecepatan mengetik Rina dalam kata per menit?',
+                answer: 60,
+                prefix: '',
+                unit: 'kata/menit',
+                options: ['40 kata/menit', '50 kata/menit', '60 kata/menit', '80 kata/menit'],
+                explanation: '240 kata ÷ 4 menit = 60 kata per menit.'
+            },
+            {
+                category: '🖨️ Produksi Mesin',
+                question: 'Sebuah mesin fotokopi mencetak 180 lembar kertas dalam waktu 3 menit. Berapa lembar kertas yang dicetak dalam 1 menit?',
+                answer: 60,
+                prefix: '',
+                unit: 'lembar/menit',
+                options: ['45 lembar/menit', '60 lembar/menit', '70 lembar/menit', '90 lembar/menit'],
+                explanation: '180 lembar ÷ 3 menit = 60 lembar per menit.'
+            },
+            {
+                category: '🧁 Produksi Kue',
+                question: 'Seorang pembuat kue menghias 36 kue donat dalam waktu 3 jam. Berapa banyak kue donat yang dihias dalam 1 jam?',
+                answer: 12,
+                prefix: '',
+                unit: 'donat/jam',
+                options: ['9 donat/jam', '12 donat/jam', '15 donat/jam', '18 donat/jam'],
+                explanation: '36 donat ÷ 3 jam = 12 donat per jam.'
+            },
+            {
+                category: '📖 Membaca Buku',
+                question: 'Aldo membaca 45 halaman buku cerita dalam waktu 3 hari dengan jumlah halaman sama setiap hari. Berapa halaman yang dibaca Aldo per 1 hari?',
+                answer: 15,
+                prefix: '',
+                unit: 'halaman/hari',
+                options: ['12 halaman/hari', '15 halaman/hari', '18 halaman/hari', '20 halaman/hari'],
+                explanation: '45 halaman ÷ 3 hari = 15 halaman per hari.'
+            },
+            {
+                category: '💰 Upah per Jam',
+                question: 'Kakak bekerja paruh waktu selama 4 jam dan mendapatkan upah Rp80.000. Berapakah upah yang diterima kakak setiap 1 jam?',
+                answer: 20000,
+                prefix: 'Rp',
+                unit: 'per jam',
+                options: ['Rp15.000', 'Rp20.000', 'Rp25.000', 'Rp40.000'],
+                explanation: 'Rp80.000 ÷ 4 jam = Rp20.000 per jam.'
+            },
+            {
+                category: '💰 Upah per Hari',
+                question: 'Seorang tukang kebun menerima upah Rp300.000 setelah bekerja selama 3 hari. Berapa upah tukang kebun tersebut per 1 hari?',
+                answer: 100000,
+                prefix: 'Rp',
+                unit: 'per hari',
+                options: ['Rp75.000', 'Rp90.000', 'Rp100.000', 'Rp150.000'],
+                explanation: 'Rp300.000 ÷ 3 hari = Rp100.000 per hari.'
+            },
+
+            // --- KATEGORI 5: ISI WADAH, KEMASAN & KEPADATAN ---
+            {
+                category: '📦 Isi per Kemasan',
+                question: 'Terdapat 48 buah jeruk yang dikemas sama banyak ke dalam 6 kantong plastik. Berapa buah jeruk dalam 1 kantong?',
+                answer: 8,
+                prefix: '',
+                unit: 'buah/kantong',
+                options: ['6 buah', '7 buah', '8 buah', '9 buah'],
+                explanation: '48 buah ÷ 6 kantong = 8 buah per kantong.'
+            },
+            {
+                category: '📦 Isi per Kotak',
+                question: 'Sebanyak 72 batang pensil dimasukkan secara merata ke dalam 6 kotak pensil. Berapa batang pensil isi setiap 1 kotak?',
+                answer: 12,
+                prefix: '',
+                unit: 'pensil/kotak',
+                options: ['10 pensil', '12 pensil', '14 pensil', '16 pensil'],
+                explanation: '72 pensil ÷ 6 kotak = 12 pensil per kotak.'
+            },
+            {
+                category: '🥚 Isi per Rak',
+                question: 'Ibu membeli 3 rak telur yang seluruhnya berisi 90 butir telur. Berapa butir telur yang terdapat pada 1 rak?',
+                answer: 30,
+                prefix: '',
+                unit: 'butir/rak',
+                options: ['25 butir', '30 butir', '35 butir', '45 butir'],
+                explanation: '90 butir ÷ 3 rak = 30 butir per rak.'
+            },
+            {
+                category: '🏫 Rasio Kelas',
+                question: 'Di sebuah sekolah terdapat 120 siswa kelas 6 yang dibagi rata ke dalam 4 ruang kelas. Berapa jumlah siswa pada setiap 1 kelas?',
+                answer: 30,
+                prefix: '',
+                unit: 'siswa/kelas',
+                options: ['25 siswa', '28 siswa', '30 siswa', '40 siswa'],
+                explanation: '120 siswa ÷ 4 kelas = 30 siswa per kelas.'
+            },
+            {
+                category: '🍪 Kalori per Keping',
+                question: 'Dalam kemasan biskuit tertulis 4 keping biskuit mengandung 200 kalori. Berapa kalori yang terkandung dalam 1 keping biskuit?',
+                answer: 50,
+                prefix: '',
+                unit: 'kalori/keping',
+                options: ['40 kalori', '50 kalori', '60 kalori', '80 kalori'],
+                explanation: '200 kalori ÷ 4 keping = 50 kalori per keping.'
+            },
+            {
+                category: '🌱 Hasil Panen',
+                question: 'Pak Tani memanen 84 kg mangga dari 7 pohon mangga dengan hasil sama banyak. Berapa kg mangga yang dihasilkan oleh 1 pohon?',
+                answer: 12,
+                prefix: '',
+                unit: 'kg/pohon',
+                options: ['11 kg', '12 kg', '13 kg', '14 kg'],
+                explanation: '84 kg ÷ 7 pohon = 12 kg per pohon.'
+            },
+            {
+                category: '🍬 Permen per Bungkus',
+                question: '5 bungkus permen berisi total 125 butir permen. Berapakah jumlah permen dalam 1 bungkus?',
+                answer: 25,
+                prefix: '',
+                unit: 'permen/bungkus',
+                options: ['20 permen', '25 permen', '30 permen', '35 permen'],
+                explanation: '125 permen ÷ 5 bungkus = 25 permen per bungkus.'
+            },
+            {
+                category: '🧶 Kain per Baju',
+                question: 'Penjahit membutuhkan 12 meter kain untuk membuat 6 potong kemeja yang sama. Berapa meter kain yang diperlukan untuk membuat 1 kemeja?',
+                answer: 2,
+                prefix: '',
+                unit: 'meter/baju',
+                options: ['2 meter', '3 meter', '4 meter', '6 meter'],
+                explanation: '12 meter ÷ 6 kemeja = 2 meter per kemeja.'
+            },
+            {
+                category: '🍫 Harga Satuan',
+                question: 'Harga 3 batang cokelat adalah Rp27.000. Berapakah harga untuk 1 batang cokelat?',
+                answer: 9000,
+                prefix: 'Rp',
+                unit: 'per batang',
+                options: ['Rp7.000', 'Rp8.000', 'Rp9.000', 'Rp11.000'],
+                explanation: 'Rp27.000 ÷ 3 batang = Rp9.000 per batang.'
+            },
+            {
+                category: '🏀 Skor per Pertandingan',
+                question: 'Tim basket sekolah mencetak total 160 poin dalam 4 pertandingan. Berapa rata-rata poin yang dicetak tim dalam 1 pertandingan?',
+                answer: 40,
+                prefix: '',
+                unit: 'poin/laga',
+                options: ['35 poin', '40 poin', '45 poin', '50 poin'],
+                explanation: '160 poin ÷ 4 pertandingan = 40 poin per pertandingan.'
+            }
+        ];
+
+        /* =====================================================================
+           3. APPLICATION STATE & SAMPLE DATA
+           ===================================================================== */
+        const WHEEL_COLORS = [
+            '#ef4444', // Red
+            '#f59e0b', // Amber
+            '#10b981', // Emerald
+            '#0ea5e9', // Sky Blue
+            '#8b5cf6', // Violet
+            '#ec4899', // Pink
+            '#f97316', // Orange
+            '#14b8a6', // Teal
+            '#3b82f6', // Blue
+            '#84cc16'  // Lime
+        ];
+
+        const SAMPLE_STUDENTS = [
+            'Ahmad Fauzi', 'Siti Nurhaliza', 'Budi Santoso', 'Dewi Lestari',
+            'Rizky Pratama', 'Nabila Putri', 'Dimas Saputra', 'Aulia Zahra',
+            'Fajar Nugroho', 'Intan Permata', 'Galih Ramadhan', 'Citra Kirana'
+        ];
+
+        let state = {
+            students: [], // { id, name, score, called, answeredCount }
+            fairMode: true,
+            answerMode: 'mcq', // 'mcq' | 'input'
+            timerSeconds: 45,
+            currentRotation: 0, // radians
+            isSpinning: false,
+            selectedStudentId: null,
+            currentQuestion: null,
+            usedQuestionIndices: new Set(),
+            questionCounter: 0,
+            timerInterval: null,
+            remainingTime: 0,
+            tempSetupNames: []
+        };
+
+        /* =====================================================================
+           4. INITIALIZATION & STUDENT ROSTER MANAGEMENT
+           ===================================================================== */
+        function initApp() {
+            document.getElementById('bank-count-label').textContent = UNIT_RATE_QUESTIONS.length;
+            // Load default 12 sample students so teacher can immediately test or edit
+            state.students = SAMPLE_STUDENTS.map((name, idx) => ({
+                id: idx + 1,
+                name,
+                score: 0,
+                called: false,
+                answeredCount: 0
+            }));
+            refreshAllUI();
+        }
+
+        function refreshAllUI() {
+            document.getElementById('header-student-count').textContent = state.students.length;
+            document.getElementById('total-count-pill').textContent = state.students.length;
+            const eligible = getEligibleStudents();
+            document.getElementById('remaining-count').textContent = eligible.length;
+
+            renderScoreboard();
+            drawWheel();
+        }
+
+        function getEligibleStudents() {
+            if (!state.fairMode) return state.students;
+            const uncalled = state.students.filter(s => !s.called);
+            return uncalled.length > 0 ? uncalled : state.students;
+        }
+
+        function toggleFairMode() {
+            state.fairMode = document.getElementById('fair-turn-toggle').checked;
+            refreshAllUI();
+        }
+
+        function updateQuizSettings() {
+            state.answerMode = document.getElementById('answer-mode-select').value;
+            state.timerSeconds = parseInt(document.getElementById('timer-select').value, 10);
+        }
+
+        function renderScoreboard() {
+            const listEl = document.getElementById('scoreboard-list');
+            listEl.innerHTML = '';
+
+            state.students.forEach((student, idx) => {
+                const row = document.createElement('div');
+                row.className = `flex items-center justify-between px-3 py-2.5 rounded-2xl border-2 transition-all ${
+                    student.called
+                        ? 'bg-slate-50 border-slate-200 opacity-85'
+                        : 'bg-emerald-50/70 border-emerald-200'
+                }`;
+
+                row.innerHTML = `
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="w-7 h-7 rounded-xl font-display font-bold text-xs text-white flex items-center justify-center shrink-0" style="background:${WHEEL_COLORS[idx % WHEEL_COLORS.length]}">
+                            ${idx + 1}
+                        </span>
+                        <div class="min-w-0">
+                            <div class="font-bold text-sm text-slate-900 truncate flex items-center gap-1.5">
+                                <span>${escapeHtml(student.name)}</span>
+                                <span class="text-xs" title="${student.called ? 'Sudah mendapat giliran' : 'Belum dipanggil'}">
+                                    ${student.called ? '✅' : '🟢'}
+                                </span>
+                            </div>
+                            <div class="text-[11px] font-semibold text-slate-500">
+                                Terjawab: ${student.answeredCount}x
+                            </div>
+                        </div>
+                    </div>
+                    <div class="font-display font-bold text-sm sm:text-base text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1 rounded-xl shrink-0">
+                        ${student.score} pts
+                    </div>
+                `;
+                listEl.appendChild(row);
+            });
+        }
+
+        function resetTurnsOnly() {
+            if (state.isSpinning) return;
+            state.students.forEach(s => s.called = false);
+            refreshAllUI();
+        }
+
+        function resetAllScoresAndTurns() {
+            if (state.isSpinning) return;
+            state.students.forEach(s => {
+                s.score = 0;
+                s.called = false;
+                s.answeredCount = 0;
+            });
+            state.usedQuestionIndices.clear();
+            state.questionCounter = 0;
+            refreshAllUI();
+        }
+
+        /* =====================================================================
+           5. SETUP MODAL (INPUT COUNT, EDIT NAMES, SAMPLE, BULK PASTE)
+           ===================================================================== */
+        function openSetupModal() {
+            if (state.isSpinning) return;
+            state.tempSetupNames = state.students.map(s => s.name);
+            document.getElementById('input-student-count').value = state.tempSetupNames.length;
+            renderSetupNameInputs();
+            document.getElementById('setup-modal').classList.remove('hidden');
+        }
+
+        function closeSetupModal() {
+            document.getElementById('setup-modal').classList.add('hidden');
+            document.getElementById('bulk-paste-box').classList.add('hidden');
+        }
+
+        function handleCountInputChange(val) {
+            let num = parseInt(val, 10);
+            if (isNaN(num)) return;
+            num = Math.max(2, Math.min(40, num));
+            document.getElementById('input-student-count').value = num;
+            applyStudentCount();
+        }
+
+        function applyStudentCount() {
+            let count = parseInt(document.getElementById('input-student-count').value, 10) || 2;
+            count = Math.max(2, Math.min(40, count));
+            document.getElementById('input-student-count').value = count;
+
+            while (state.tempSetupNames.length < count) {
+                state.tempSetupNames.push(`Siswa ${state.tempSetupNames.length + 1}`);
+            }
+            if (state.tempSetupNames.length > count) {
+                state.tempSetupNames = state.tempSetupNames.slice(0, count);
+            }
+            renderSetupNameInputs();
+        }
+
+        function renderSetupNameInputs() {
+            const grid = document.getElementById('setup-names-grid');
+            grid.innerHTML = '';
+
+            state.tempSetupNames.forEach((name, i) => {
+                const wrap = document.createElement('div');
+                wrap.className = 'flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5';
+                wrap.innerHTML = `
+                    <span class="w-6 h-6 rounded-lg text-white font-display font-bold text-xs flex items-center justify-center shrink-0" style="background:${WHEEL_COLORS[i % WHEEL_COLORS.length]}">
+                        ${i + 1}
+                    </span>
+                    <input type="text" maxlength="24" value="${escapeHtml(name)}"
+                        oninput="state.tempSetupNames[${i}] = this.value"
+                        placeholder="Nama Siswa ${i + 1}"
+                        class="w-full bg-transparent text-sm font-bold text-slate-800 focus:outline-none"/>
+                `;
+                grid.appendChild(wrap);
+            });
+        }
+
+        function fillSampleClass() {
+            const currentLen = state.tempSetupNames.length || 12;
+            const targetCount = Math.max(2, Math.min(40, currentLen));
+            const newNames = [];
+            for (let i = 0; i < targetCount; i++) {
+                if (i < SAMPLE_STUDENTS.length) {
+                    newNames.push(SAMPLE_STUDENTS[i]);
+                } else {
+                    newNames.push(`Siswa ${i + 1}`);
+                }
+            }
+            state.tempSetupNames = newNames;
+            document.getElementById('input-student-count').value = targetCount;
+            renderSetupNameInputs();
+        }
+
+        function clearAllNames() {
+            state.tempSetupNames = state.tempSetupNames.map((_, idx) => `Siswa ${idx + 1}`);
+            renderSetupNameInputs();
+        }
+
+        function toggleBulkPaste() {
+            const box = document.getElementById('bulk-paste-box');
+            box.classList.toggle('hidden');
+            if (!box.classList.contains('hidden')) {
+                document.getElementById('bulk-names-textarea').value = state.tempSetupNames.join('\n');
+            }
+        }
+
+        function importBulkNames() {
+            const raw = document.getElementById('bulk-names-textarea').value;
+            const parsed = raw
+                .split(/[\n,;]+/)
+                .map(s => s.trim())
+                .filter(Boolean)
+                .slice(0, 40);
+
+            if (parsed.length < 2) {
+                // Keep at least 2 entries
+                while (parsed.length < 2) {
+                    parsed.push(`Siswa ${parsed.length + 1}`);
+                }
+            }
+
+            state.tempSetupNames = parsed;
+            document.getElementById('input-student-count').value = parsed.length;
+            renderSetupNameInputs();
+            document.getElementById('bulk-paste-box').classList.add('hidden');
+        }
+
+        function saveSetupAndClose() {
+            const updatedStudents = state.tempSetupNames.map((rawName, idx) => {
+                const cleanName = rawName.trim() || `Siswa ${idx + 1}`;
+                const existing = state.students[idx];
+                return {
+                    id: idx + 1,
+                    name: cleanName,
+                    score: existing ? existing.score : 0,
+                    called: existing ? existing.called : false,
+                    answeredCount: existing ? existing.answeredCount : 0
+                };
+            });
+
+            state.students = updatedStudents;
+            closeSetupModal();
+            refreshAllUI();
+        }
+
+        /* =====================================================================
+           6. SPIN WHEEL RENDERING & SMOOTH DECELERATION PHYSICS
+           ===================================================================== */
+        function drawWheel() {
+            const canvas = document.getElementById('wheel-canvas');
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            const size = Math.max(300, Math.floor(rect.width || 480));
+
+            canvas.width = size * dpr;
+            canvas.height = size * dpr;
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            const cx = size / 2;
+            const cy = size / 2;
+            const radius = size / 2 - 6;
+
+            const segments = getEligibleStudents();
+            const count = segments.length;
+            if (count === 0) return;
+
+            const arc = (2 * Math.PI) / count;
+
+            ctx.clearRect(0, 0, size, size);
+
+            // Draw each student slice
+            for (let i = 0; i < count; i++) {
+                const student = segments[i];
+                const startAngle = state.currentRotation + i * arc;
+                const endAngle = startAngle + arc;
+
+                // Slice fill
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, radius, startAngle, endAngle);
+                ctx.closePath();
+
+                const originalIdx = state.students.findIndex(s => s.id === student.id);
+                ctx.fillStyle = WHEEL_COLORS[(originalIdx >= 0 ? originalIdx : i) % WHEEL_COLORS.length];
+                ctx.fill();
+
+                // Crisp white divider border
+                ctx.lineWidth = count > 24 ? 1.5 : 2.5;
+                ctx.strokeStyle = '#ffffff';
+                ctx.stroke();
+
+                // Draw radial student name text readable from classroom distance
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(startAngle + arc / 2);
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+
+                // Dynamic font sizing based on number of slices
+                let fontSize = 18;
+                if (count <= 8) fontSize = Math.max(16, Math.floor(size * 0.044));
+                else if (count <= 16) fontSize = Math.max(13, Math.floor(size * 0.034));
+                else if (count <= 26) fontSize = Math.max(11, Math.floor(size * 0.025));
+                else fontSize = Math.max(9.5, Math.floor(size * 0.021));
+
+                ctx.font = `800 ${fontSize}px "Plus Jakarta Sans", sans-serif`;
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
+
+                const maxLabelLen = count > 20 ? 12 : 16;
+                const label = student.name.length > maxLabelLen
+                    ? student.name.slice(0, maxLabelLen - 1) + '…'
+                    : student.name;
+
+                ctx.fillText(label, radius - 18, 0);
+                ctx.restore();
+            }
+
+            // Outer rim ring
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = '#ffffff';
+            ctx.stroke();
+        }
+
+        function spinWheel() {
+            if (state.isSpinning || state.students.length === 0) return;
+
+            // If in fair mode and everyone has been called, reset turns automatically for a new round
+            if (state.fairMode && state.students.every(s => s.called)) {
+                state.students.forEach(s => s.called = false);
+                refreshAllUI();
+            }
+
+            const segments = getEligibleStudents();
+            const count = segments.length;
+            const arc = (2 * Math.PI) / count;
+
+            state.isSpinning = true;
+            document.getElementById('btn-spin-main').disabled = true;
+            document.getElementById('center-spin-btn').disabled = true;
+
+            audio.ensureContext();
+
+            // 5 to 8 full spins + random landing angle
+            const extraSpins = (5 + Math.random() * 3) * 2 * Math.PI;
+            const randomOffset = Math.random() * 2 * Math.PI;
+            const startRotation = state.currentRotation;
+            const targetRotation = startRotation + extraSpins + randomOffset;
+
+            const duration = 4200; // ms
+            const startTime = performance.now();
+            let lastSliceIdx = -1;
+
+            function animateSpin(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Quintic ease-out for natural friction deceleration
+                const easeOut = 1 - Math.pow(1 - progress, 5);
+                state.currentRotation = startRotation + (targetRotation - startRotation) * easeOut;
+
+                drawWheel();
+
+                // Detect slice crossing under top pointer (-PI / 2) for tick sound & pointer bounce
+                const pointerAngle = (1.5 * Math.PI - (state.currentRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+                const currentSliceIdx = Math.floor(pointerAngle / arc) % count;
+
+                if (currentSliceIdx !== lastSliceIdx) {
+                    lastSliceIdx = currentSliceIdx;
+                    audio.playTick();
+                    const ptr = document.getElementById('wheel-pointer');
+                    ptr.classList.remove('pointer-ticking');
+                    void ptr.offsetWidth;
+                    ptr.classList.add('pointer-ticking');
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateSpin);
+                } else {
+                    state.isSpinning = false;
+                    document.getElementById('btn-spin-main').disabled = false;
+                    document.getElementById('center-spin-btn').disabled = false;
+
+                    const chosenStudent = segments[currentSliceIdx];
+                    handleStudentSelected(chosenStudent);
+                }
+            }
+
+            requestAnimationFrame(animateSpin);
+        }
+
+        function handleStudentSelected(student) {
+            state.selectedStudentId = student.id;
+            audio.playSelected();
+
+            // Open interactive Unit Rate quiz modal after brief anticipation pause
+            setTimeout(() => {
+                openQuizModal(student);
+            }, 420);
+        }
+
+        /* =====================================================================
+           7. INTERACTIVE UNIT RATE QUIZ MODAL & TIMER
+           ===================================================================== */
+        function pickNextQuestion() {
+            if (state.usedQuestionIndices.size >= UNIT_RATE_QUESTIONS.length) {
+                state.usedQuestionIndices.clear();
+            }
+            const available = [];
+            for (let i = 0; i < UNIT_RATE_QUESTIONS.length; i++) {
+                if (!state.usedQuestionIndices.has(i)) available.push(i);
+            }
+            const chosenIdx = available[Math.floor(Math.random() * available.length)];
+            state.usedQuestionIndices.add(chosenIdx);
+            state.questionCounter += 1;
+            return UNIT_RATE_QUESTIONS[chosenIdx];
+        }
+
+        function openQuizModal(student) {
+            updateQuizSettings();
+            const qObj = pickNextQuestion();
+            state.currentQuestion = qObj;
+
+            document.getElementById('quiz-student-name').textContent = student.name;
+            document.getElementById('quiz-category-tag').textContent = `${qObj.category} • Level Setara`;
+            document.getElementById('quiz-number-tag').textContent = `Soal #${state.questionCounter}`;
+            document.getElementById('quiz-question-text').textContent = qObj.question;
+
+            // Reset feedback & buttons
+            document.getElementById('quiz-feedback-panel').classList.add('hidden');
+            document.getElementById('btn-next-spin').classList.add('hidden');
+            document.getElementById('btn-swap-question').disabled = false;
+            document.getElementById('btn-skip-turn').classList.remove('hidden');
+
+            // Render Mode A (MCQ) or Mode B (Numeric Input)
+            const mcqContainer = document.getElementById('quiz-mcq-container');
+            const inputContainer = document.getElementById('quiz-input-container');
+
+            if (state.answerMode === 'mcq') {
+                mcqContainer.classList.remove('hidden');
+                inputContainer.classList.add('hidden');
+                renderMcqOptions(qObj);
+            } else {
+                mcqContainer.classList.add('hidden');
+                inputContainer.classList.remove('hidden');
+                setupNumericInput(qObj);
+            }
+
+            startQuizTimer();
+            document.getElementById('quiz-modal').classList.remove('hidden');
+        }
+
+        function swapSimilarQuestion() {
+            if (!state.selectedStudentId) return;
+            const student = state.students.find(s => s.id === state.selectedStudentId);
+            if (!student) return;
+            stopQuizTimer();
+            openQuizModal(student);
+        }
+
+        function renderMcqOptions(qObj) {
+            const container = document.getElementById('quiz-mcq-container');
+            container.innerHTML = '';
+            const letters = ['A', 'B', 'C', 'D'];
+
+            qObj.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'mcq-btn btn-push bg-white hover:bg-sky-50 border-2 border-slate-300 hover:border-sky-500 rounded-2xl p-4 text-left flex items-center gap-3 shadow-sm transition-colors';
+                btn.innerHTML = `
+                    <span class="w-9 h-9 rounded-xl bg-sky-100 text-sky-800 font-display font-bold text-lg flex items-center justify-center shrink-0">
+                        ${letters[idx]}
+                    </span>
+                    <span class="font-extrabold text-base sm:text-lg text-slate-900">${optText}</span>
+                `;
+                btn.onclick = () => evaluateMcqAnswer(optText, idx);
+                container.appendChild(btn);
+            });
+        }
+
+        function setupNumericInput(qObj) {
+            const prefixEl = document.getElementById('quiz-prefix-label');
+            const suffixEl = document.getElementById('quiz-suffix-label');
+            const hintEl = document.getElementById('quiz-unit-hint');
+            const inputEl = document.getElementById('quiz-numeric-input');
+            const submitBtn = document.getElementById('btn-submit-numeric');
+
+            if (qObj.prefix) {
+                prefixEl.textContent = qObj.prefix;
+                prefixEl.classList.remove('hidden');
+                inputEl.classList.remove('rounded-2xl');
+                inputEl.classList.add('rounded-r-2xl');
+            } else {
+                prefixEl.classList.add('hidden');
+                inputEl.classList.remove('rounded-r-2xl');
+                inputEl.classList.add('rounded-2xl');
+            }
+
+            suffixEl.textContent = qObj.unit;
+            hintEl.textContent = qObj.unit;
+            inputEl.value = '';
+            inputEl.disabled = false;
+            submitBtn.disabled = false;
+            setTimeout(() => inputEl.focus(), 120);
+        }
+
+        function parseNumericString(str) {
+            // Clean Indonesian thousand dots/spaces (e.g., "6.000" -> 6000, "Rp 6.000" -> 6000)
+            const cleaned = str.replace(/rp/gi, '').replace(/\./g, '').replace(/,/g, '.').replace(/\s+/g, '');
+            return parseFloat(cleaned);
+        }
+
+        function evaluateMcqAnswer(selectedText, selectedIdx) {
+            stopQuizTimer();
+            const qObj = state.currentQuestion;
+            const selectedNumeric = parseNumericString(selectedText);
+            const isCorrect = Math.abs(selectedNumeric - qObj.answer) < 0.001;
+
+            const buttons = document.querySelectorAll('.mcq-btn');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                const optNum = parseNumericString(qObj.options[i]);
+                if (Math.abs(optNum - qObj.answer) < 0.001) {
+                    btn.className = 'mcq-btn bg-emerald-500 text-white border-2 border-emerald-700 rounded-2xl p-4 text-left flex items-center gap-3 shadow-md';
+                    btn.querySelector('span:first-child').className = 'w-9 h-9 rounded-xl bg-white text-emerald-700 font-display font-bold text-lg flex items-center justify-center shrink-0';
+                    btn.querySelector('span:last-child').className = 'font-extrabold text-base sm:text-lg text-white';
+                } else if (i === selectedIdx && !isCorrect) {
+                    btn.className = 'mcq-btn bg-rose-500 text-white border-2 border-rose-700 rounded-2xl p-4 text-left flex items-center gap-3 shadow-md';
+                    btn.querySelector('span:first-child').className = 'w-9 h-9 rounded-xl bg-white text-rose-700 font-display font-bold text-lg flex items-center justify-center shrink-0';
+                    btn.querySelector('span:last-child').className = 'font-extrabold text-base sm:text-lg text-white';
+                } else {
+                    btn.classList.add('opacity-45');
+                }
+            });
+
+            finalizeQuestionResult(isCorrect);
+        }
+
+        function submitNumericAnswer() {
+            const inputEl = document.getElementById('quiz-numeric-input');
+            const rawVal = inputEl.value.trim();
+            if (!rawVal) {
+                inputEl.focus();
+                return;
+            }
+            const userNum = parseNumericString(rawVal);
+            if (isNaN(userNum)) {
+                inputEl.focus();
+                return;
+            }
+
+            stopQuizTimer();
+            inputEl.disabled = true;
+            document.getElementById('btn-submit-numeric').disabled = true;
+
+            const isCorrect = Math.abs(userNum - state.currentQuestion.answer) < 0.001;
+            finalizeQuestionResult(isCorrect);
+        }
+
+        function finalizeQuestionResult(isCorrect, isTimeout = false) {
+            const student = state.students.find(s => s.id === state.selectedStudentId);
+            const qObj = state.currentQuestion;
+
+            if (student) {
+                student.called = true;
+                student.answeredCount += 1;
+                if (isCorrect) {
+                    student.score += 100;
+                }
+            }
+
+            document.getElementById('btn-swap-question').disabled = true;
+            document.getElementById('btn-skip-turn').classList.add('hidden');
+            document.getElementById('btn-next-spin').classList.remove('hidden');
+
+            const panel = document.getElementById('quiz-feedback-panel');
+            const icon = document.getElementById('feedback-icon');
+            const title = document.getElementById('feedback-title');
+            const explanation = document.getElementById('feedback-explanation');
+
+            panel.classList.remove('hidden');
+            explanation.textContent = qObj.explanation;
+
+            if (isCorrect) {
+                audio.playCorrect();
+                panel.className = 'rounded-2xl p-4 sm:p-5 border-2 mt-2 bg-emerald-50 border-emerald-400 text-emerald-950';
+                icon.textContent = '🎉';
+                title.textContent = `Hebat, ${student ? student.name : ''}! Jawaban Benar (+100 Poin)`;
+            } else {
+                audio.playWrong();
+                panel.className = 'rounded-2xl p-4 sm:p-5 border-2 mt-2 bg-rose-50 border-rose-400 text-rose-950';
+                icon.textContent = isTimeout ? '⏰' : '💡';
+                const formattedCorrect = qObj.prefix
+                    ? `${qObj.prefix}${qObj.answer.toLocaleString('id-ID')}`
+                    : `${qObj.answer.toLocaleString('id-ID')} ${qObj.unit}`;
+                title.textContent = isTimeout
+                    ? `Waktu Habis! Jawaban yang tepat: ${formattedCorrect}`
+                    : `Kurang Tepat! Jawaban yang benar adalah ${formattedCorrect}`;
+            }
+
+            refreshAllUI();
+        }
+
+        function skipStudentTurn() {
+            stopQuizTimer();
+            const student = state.students.find(s => s.id === state.selectedStudentId);
+            if (student) {
+                student.called = true;
+            }
+            closeQuizAndContinue();
+        }
+
+        function closeQuizAndContinue() {
+            stopQuizTimer();
+            document.getElementById('quiz-modal').classList.add('hidden');
+            refreshAllUI();
+
+            // Check if all students have completed their turn in Fair Mode
+            if (state.fairMode && state.students.length > 0 && state.students.every(s => s.called)) {
+                setTimeout(() => {
+                    openSummaryModal(true);
+                }, 350);
+            }
+        }
+
+        /* =====================================================================
+           8. OPTIONAL COUNTDOWN TIMER
+           ===================================================================== */
+        function startQuizTimer() {
+            stopQuizTimer();
+            const badge = document.getElementById('quiz-timer-badge');
+            const secSpan = document.getElementById('quiz-timer-seconds');
+
+            if (state.timerSeconds <= 0) {
+                badge.classList.add('hidden');
+                return;
+            }
+
+            state.remainingTime = state.timerSeconds;
+            secSpan.textContent = state.remainingTime;
+            badge.classList.remove('hidden');
+            badge.className = 'bg-slate-900/40 border border-white/30 px-3.5 py-1.5 rounded-2xl font-display font-bold text-lg text-amber-300';
+
+            state.timerInterval = setInterval(() => {
+                state.remainingTime -= 1;
+                secSpan.textContent = state.remainingTime;
+
+                if (state.remainingTime <= 10 && state.remainingTime > 0) {
+                    badge.className = 'bg-rose-600 border border-white px-3.5 py-1.5 rounded-2xl font-display font-bold text-lg text-white animate-pulse';
+                    audio.playTick();
+                }
+
+                if (state.remainingTime <= 0) {
+                    stopQuizTimer();
+                    // Disable inputs and mark timeout
+                    document.querySelectorAll('.mcq-btn').forEach(b => b.disabled = true);
+                    document.getElementById('quiz-numeric-input').disabled = true;
+                    document.getElementById('btn-submit-numeric').disabled = true;
+                    finalizeQuestionResult(false, true);
+                }
+            }, 1000);
+        }
+
+        function stopQuizTimer() {
+            if (state.timerInterval) {
+                clearInterval(state.timerInterval);
+                state.timerInterval = null;
+            }
+        }
+
+        /* =====================================================================
+           9. FINAL SUMMARY, PODIUM RANKINGS & CONFETTI
+           ===================================================================== */
+        function openSummaryModal(isRoundComplete = false) {
+            const titleEl = document.getElementById('summary-title');
+            const subEl = document.getElementById('summary-subtitle');
+
+            if (isRoundComplete) {
+                titleEl.textContent = '🎊 Semua Siswa Telah Mendapat Giliran!';
+                subEl.textContent = 'Berikut adalah hasil akhir perolehan poin Rasio Satuan kelas hari ini:';
+                audio.playCelebration();
+                launchConfetti();
+            } else {
+                titleEl.textContent = '🏆 Rekap Skor Rasio Satuan';
+                subEl.textContent = 'Peringkat sementara perolehan poin peserta didik di kelas';
+            }
+
+            const sorted = [...state.students].sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return b.answeredCount - a.answeredCount;
+            });
+
+            const listEl = document.getElementById('summary-ranking-list');
+            listEl.innerHTML = '';
+
+            sorted.forEach((student, idx) => {
+                const badge = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `#${idx + 1}`));
+                const row = document.createElement('div');
+                row.className = `flex items-center justify-between px-4 py-3 rounded-2xl border-2 ${
+                    idx === 0
+                        ? 'bg-amber-100 border-amber-400 shadow-sm'
+                        : 'bg-slate-50 border-slate-200'
+                }`;
+
+                row.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="font-display font-bold text-lg w-8 text-center">${badge}</span>
+                        <div>
+                            <div class="font-bold text-base text-slate-900">${escapeHtml(student.name)}</div>
+                            <div class="text-xs font-semibold text-slate-500">
+                                Status: ${student.called ? 'Sudah tampil' : 'Belum tampil'} • Menjawab ${student.answeredCount}x
+                            </div>
+                        </div>
+                    </div>
+                    <div class="font-display font-bold text-lg text-emerald-700 bg-emerald-100 border border-emerald-300 px-3.5 py-1 rounded-xl">
+                        ${student.score} Poin
+                    </div>
+                `;
+                listEl.appendChild(row);
+            });
+
+            document.getElementById('summary-modal').classList.remove('hidden');
+        }
+
+        function closeSummaryModal() {
+            document.getElementById('summary-modal').classList.add('hidden');
+            stopConfetti();
+        }
+
+        function restartWholeGame() {
+            closeSummaryModal();
+            resetAllScoresAndTurns();
+        }
+
+        /* =====================================================================
+           10. CONFETTI & UTILITIES
+           ===================================================================== */
+        let confettiReqId = null;
+
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const pieces = Array.from({ length: 110 }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                w: 8 + Math.random() * 8,
+                h: 6 + Math.random() * 6,
+                color: WHEEL_COLORS[Math.floor(Math.random() * WHEEL_COLORS.length)],
+                vx: -1.5 + Math.random() * 3,
+                vy: 2.5 + Math.random() * 3.5,
+                rot: Math.random() * 360,
+                vRot: -4 + Math.random() * 8
+            }));
+
+            function frame() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                pieces.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.rot += p.vRot;
+                    if (p.y > canvas.height) {
+                        p.y = -12;
+                        p.x = Math.random() * canvas.width;
+                    }
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rot * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    ctx.restore();
+                });
+                confettiReqId = requestAnimationFrame(frame);
+            }
+            frame();
+        }
+
+        function stopConfetti() {
+            if (confettiReqId) {
+                cancelAnimationFrame(confettiReqId);
+                confettiReqId = null;
+            }
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Keyboard shortcut: Spacebar to spin wheel when no modal is open
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                const setupHidden = document.getElementById('setup-modal').classList.contains('hidden');
+                const quizHidden = document.getElementById('quiz-modal').classList.contains('hidden');
+                const summaryHidden = document.getElementById('summary-modal').classList.contains('hidden');
+                if (setupHidden && quizHidden && summaryHidden && !state.isSpinning) {
+                    e.preventDefault();
+                    spinWheel();
+                }
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            drawWheel();
+        });
+
+        window.onload = function () {
+            initApp();
+        };
+    </script>
+</body>
+</html>
