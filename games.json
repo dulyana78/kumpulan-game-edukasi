@@ -1,0 +1,37 @@
+[
+  {
+    "title": "PAPIN - Petualangan Ular Tangga Pintar",
+    "description": "Game edukasi ular tangga interaktif",
+    "file": "PAPIN - Petualangan Ular Tangga Pintar.html",
+    "category": "Board Game",
+    "icon": "🎲"
+  },
+  {
+    "title": "Roda Keberuntungan - Sistem Pencernaan Manusia",
+    "description": "Belajar sistem pencernaan melalui roda keberuntungan",
+    "file": "Roda Keberuntungan - Sistem Pencernaan Manusia.html",
+    "category": "Quiz",
+    "icon": "🎡"
+  },
+  {
+    "title": "Roda Putar Rasio Satuan",
+    "description": "Game belajar rasio dan satuan",
+    "file": "Roda Putar Rasio Satuan.html",
+    "category": "Matematika",
+    "icon": "🔢"
+  },
+  {
+    "title": "Super Mario Edukasi",
+    "description": "Game platformer edukasi",
+    "file": "Super Mario Edukasi - Tujuan Pembelajaran Platformer.html",
+    "category": "Adventure",
+    "icon": "🍄"
+  },
+  {
+    "title": "Media Kuis & Tebak Gambar Edukasi",
+    "description": "Kuis interaktif dan permainan tebak gambar",
+    "file": "media_kuis_tebak_gambar_offline.html",
+    "category": "Quiz",
+    "icon": "🖼️"
+  }
+]
