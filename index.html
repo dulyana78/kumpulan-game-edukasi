@@ -1,58 +1,35 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Game Edukasi</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            text-align: center;
-            padding: 30px 15px;
-            min-height: 100vh;
-            margin: 0;
-        }
-        h1 { margin-bottom: 10px; font-size: 26px; }
-        p { margin-bottom: 30px; color: #d0e1fd; font-size: 14px; }
-        .daftar-game {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        .tombol-game {
-            display: block;
-            background-color: #ffffff;
-            color: #1e3c72;
-            text-decoration: none;
-            padding: 16px 20px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s, background-color 0.2s;
-        }
-        .tombol-game:hover, .tombol-game:active {
-            background-color: #ffca28;
-            color: #000000;
-            transform: scale(1.03);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Game Edukasi</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(135deg,#183b78,#28579a);color:#fff;min-height:100vh}.header{text-align:center;padding:35px 18px 22px}.header h1{margin:0;font-size:clamp(25px,5vw,38px)}.header p{color:#dbeafe;margin:10px 0 0}.wrap{max-width:1100px;margin:auto;padding:0 16px 40px}.toolbar{background:#fff;color:#1e3a5f;border-radius:18px;padding:15px;box-shadow:0 8px 25px #0b1c3c33;margin:15px 0 20px}.search{width:100%;padding:14px 16px;border:1px solid #dbe3ee;border-radius:12px;font-size:16px;outline:none}.search:focus{border-color:#3978d3;box-shadow:0 0 0 3px #3978d322}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.filter{border:0;background:#eaf1fb;color:#24477d;padding:9px 13px;border-radius:999px;font-weight:600;cursor:pointer}.filter.active{background:#24549a;color:#fff}.count{color:#64748b;font-size:14px;margin:14px 2px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.card{background:#fff;color:#243b5a;border-radius:18px;padding:20px;box-shadow:0 8px 20px #0b1c3c33;display:flex;flex-direction:column;min-height:210px}.emoji{font-size:34px;margin-bottom:10px}.card h2{font-size:19px;line-height:1.35;margin:0 0 9px}.card p{color:#64748b;font-size:14px;line-height:1.5;margin:0 0 16px;flex:1}.tag{display:inline-block;background:#eef4ff;color:#315b94;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;margin-bottom:13px;align-self:flex-start}.play{display:block;text-align:center;text-decoration:none;background:#24549a;color:#fff;border-radius:11px;padding:12px;font-weight:700}.play:hover{background:#183d76}.empty{text-align:center;background:#ffffff15;border:1px dashed #ffffff55;border-radius:15px;padding:35px;grid-column:1/-1}.footer{text-align:center;color:#dbeafe;font-size:13px;margin-top:30px}.loading{grid-column:1/-1;text-align:center;padding:35px;color:#eaf2ff}@media(max-width:480px){.header{padding-top:28px}.card{min-height:190px}}
+</style>
 </head>
 <body>
-
-    <h1>🎮 Portal Game Edukasi</h1>
-    <p>Pilih game yang ingin dimainkan:</p>
-    
-    <div class="daftar-game">
-        <a href="PAPIN - Petualangan Ular Tangga Pintar.html" class="tombol-game">🎲 PAPIN - Petualangan Ular Tangga Pintar</a>
-        <a href="Roda Keberuntungan - Sistem Pencernaan Manusia.html" class="tombol-game">🧬 Roda Keberuntungan - Sistem Pencernaan Manusia</a>
-        <a href="Roda Putar Rasio Satuan.html" class="tombol-game">🎡 Roda Putar Rasio Satuan</a>
-        <a href="Super Mario Edukasi - Tujuan Pembelajaran Platformer.html" class="tombol-game">🍄 Super Mario Edukasi - Tujuan Pembelajaran Platformer</a>
-    </div>
-
+<header class="header"><h1>🎮 Portal Game Edukasi</h1><p>Belajar sambil bermain · Pilih permainan yang ingin dimainkan</p></header>
+<main class="wrap">
+<section class="toolbar"><input id="search" class="search" type="search" placeholder="🔍 Cari nama game atau materi..." aria-label="Cari game"><div id="filters" class="filters"></div><div id="count" class="count"></div></section>
+<section id="games" class="grid"><div class="loading">Memuat daftar game...</div></section>
+<div class="footer">Portal Game Edukasi · Game dapat ditambahkan melalui file games.json</div>
+</main>
+<script>
+const fallbackGames=[
+{title:'PAPIN - Petualangan Ular Tangga Pintar',file:'PAPIN - Petualangan Ular Tangga Pintar.html',category:'Game Edukasi',emoji:'🐍',description:'Petualangan ular tangga dengan tantangan dan pertanyaan edukatif.'},
+{title:'Roda Keberuntungan - Sistem Pencernaan Manusia',file:'Roda Keberuntungan - Sistem Pencernaan Manusia.html',category:'IPA / IPAS',emoji:'🧬',description:'Belajar mengenal sistem pencernaan manusia melalui roda keberuntungan.'},
+{title:'Roda Putar Rasio Satuan',file:'Roda Putar Rasio Satuan.html',category:'Matematika',emoji:'🎡',description:'Latihan rasio satuan melalui permainan roda putar.'},
+{title:'Super Mario Edukasi - Tujuan Pembelajaran Platformer',file:'Super Mario Edukasi - Tujuan Pembelajaran Platformer.html',category:'Game Edukasi',emoji:'🍄',description:'Game platformer edukasi dengan tujuan pembelajaran.'},
+{title:'Media Kuis & Tebak Gambar Edukasi',file:'media_kuis_tebak_gambar_offline.html',category:'Kuis',emoji:'🧠',description:'Dua permainan dalam satu media: kuis pilihan ganda dan tebak gambar edukasi.'}
+];
+let games=fallbackGames,active='Semua Game';
+const categories=()=>['Semua Game',...new Set(games.map(g=>g.category||'Game Edukasi'))];
+function renderFilters(){document.getElementById('filters').innerHTML=categories().map(c=>`<button class="filter ${c===active?'active':''}" onclick="setCategory(${JSON.stringify(c)})">${c}</button>`).join('')}
+function setCategory(c){active=c;renderFilters();renderGames()}
+function renderGames(){const q=document.getElementById('search').value.toLowerCase().trim();const shown=games.filter(g=>(active==='Semua Game'||(g.category||'Game Edukasi')===active)&&(`${g.title} ${g.description||''} ${g.category||''}`).toLowerCase().includes(q));document.getElementById('count').textContent=`Menampilkan ${shown.length} dari ${games.length} game`;const box=document.getElementById('games');if(!shown.length){box.innerHTML='<div class="empty">Game tidak ditemukan. Coba kata pencarian lain.</div>';return}box.innerHTML=shown.map(g=>`<article class="card"><div class="emoji">${g.emoji||'🎮'}</div><span class="tag">${g.category||'Game Edukasi'}</span><h2>${g.title}</h2><p>${g.description||'Game edukasi untuk belajar sambil bermain.'}</p><a class="play" href="${encodeURI(g.file)}">▶ Mainkan Game</a></article>`).join('')}
+document.getElementById('search').addEventListener('input',renderGames);
+fetch('games.json').then(r=>{if(!r.ok)throw new Error('');return r.json()}).then(data=>{if(Array.isArray(data)&&data.length){games=data;active='Semua Game';renderFilters();renderGames()}}).catch(()=>{renderFilters();renderGames()});
+</script>
 </body>
 </html>
